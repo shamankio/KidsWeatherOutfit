@@ -1,17 +1,35 @@
-*.iml
+# Gradle
 .gradle
+/build
+.kotlin
+
+# Local configuration
 /local.properties
+
+# Android Studio / IntelliJ
+*.iml
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
+
+# Native build
 .externalNativeBuild
 .cxx
-local.properties
+
+# Android Studio captures
+/captures
+
+# Signing
+*.jks
+*.keystore
+keystore.properties
+
+# OS
+.DS_Store
+
+# Claude Code / project-local
 .claude/settings.local.json
 CLAUDE.md
