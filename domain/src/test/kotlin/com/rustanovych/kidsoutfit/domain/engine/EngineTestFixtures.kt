@@ -8,18 +8,22 @@ import com.rustanovych.kidsoutfit.domain.model.WeatherSnapshot
 /** Builds a [WeatherSnapshot] with sane defaults (clear, calm, dry) for engine tests. */
 internal fun testSnapshot(
     hour: Int = 8,
+    temperature: Double = 10.0,
     apparentTemperature: Double = 10.0,
     precipitationMm: Double = 0.0,
     snowfallCm: Double = 0.0,
     windSpeedKmh: Double = 0.0,
     weatherCode: Int = 0,
+    uvIndex: Double = 0.0,
 ): WeatherSnapshot = WeatherSnapshot(
     hour = hour,
+    temperature = temperature,
     apparentTemperature = apparentTemperature,
     precipitationMm = precipitationMm,
     snowfallCm = snowfallCm,
     windSpeedKmh = windSpeedKmh,
     weatherCode = weatherCode,
+    uvIndex = uvIndex,
 )
 
 /** Builds a [ChildProfile] with a neutral (zero) cold sensitivity by default. */

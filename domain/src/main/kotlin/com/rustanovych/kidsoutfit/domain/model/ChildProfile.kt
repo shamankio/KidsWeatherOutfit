@@ -15,4 +15,15 @@ data class ChildProfile(
     val coldSensitivity: ColdSensitivity,
     val departureHour: Int,
     val departureMinute: Int,
-)
+) {
+    companion object {
+
+        /** What a parent sees before touching settings: both children, no offset, leaving at 08:00. */
+        val Default = ChildProfile(
+            gender = ChildGender.BOTH,
+            coldSensitivity = ColdSensitivity.Default,
+            departureHour = 8,
+            departureMinute = 0,
+        )
+    }
+}
