@@ -28,3 +28,4 @@ keystore.properties
 # Claude Code / project-local
 .claude/settings.local.json
 CLAUDE.md
+progress.md
