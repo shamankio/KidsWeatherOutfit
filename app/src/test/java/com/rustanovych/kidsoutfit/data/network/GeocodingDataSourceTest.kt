@@ -28,7 +28,7 @@ class GeocodingDataSourceTest {
             ),
         )
 
-        val result = GeocodingDataSource(service).searchPlaces("Kyiv")
+        val result = GeocodingDataSource(service).search("Kyiv")
 
         val place = result.getOrThrow().single()
         assertEquals("Kyiv", place.name)
@@ -40,7 +40,7 @@ class GeocodingDataSourceTest {
     fun `sends the query with the configured count`() = runTest {
         val service = FakeGeocodingService()
 
-        GeocodingDataSource(service, language = { "en" }).searchPlaces("Lviv")
+        GeocodingDataSource(service, language = { "en" }).search("Lviv")
 
         assertEquals(listOf("Lviv"), service.queries)
         assertEquals(GeocodingService.RESULT_COUNT, service.lastCount)
@@ -52,7 +52,7 @@ class GeocodingDataSourceTest {
         // matches when the language travels with it.
         val service = FakeGeocodingService()
 
-        GeocodingDataSource(service, language = { "uk" }).searchPlaces("Київ")
+        GeocodingDataSource(service, language = { "uk" }).search("Київ")
 
         assertEquals(listOf("Київ"), service.queries)
         assertEquals("uk", service.lastLanguage)
@@ -64,9 +64,9 @@ class GeocodingDataSourceTest {
         var current = "uk"
         val dataSource = GeocodingDataSource(service, language = { current })
 
-        dataSource.searchPlaces("Київ")
+        dataSource.search("Київ")
         current = "de"
-        dataSource.searchPlaces("Berlin")
+        dataSource.search("Berlin")
 
         assertEquals("de", service.lastLanguage)
     }
@@ -75,7 +75,7 @@ class GeocodingDataSourceTest {
     fun `falls back to English when the device reports no language`() = runTest {
         val service = FakeGeocodingService()
 
-        GeocodingDataSource(service, language = { "" }).searchPlaces("Lviv")
+        GeocodingDataSource(service, language = { "" }).search("Lviv")
 
         assertEquals(GeocodingService.LANGUAGE_FALLBACK, service.lastLanguage)
     }
@@ -87,7 +87,7 @@ class GeocodingDataSourceTest {
             val dataSource = GeocodingDataSource(service)
 
             listOf("", "K", "  ", " a ").forEach { query ->
-                assertTrue(query, dataSource.searchPlaces(query).getOrThrow().isEmpty())
+                assertTrue(query, dataSource.search(query).getOrThrow().isEmpty())
             }
 
             assertTrue(service.queries.isEmpty())
@@ -97,7 +97,7 @@ class GeocodingDataSourceTest {
     fun `trims the query before searching`() = runTest {
         val service = FakeGeocodingService()
 
-        GeocodingDataSource(service).searchPlaces("  Kyiv  ")
+        GeocodingDataSource(service).search("  Kyiv  ")
 
         assertEquals(listOf("Kyiv"), service.queries)
     }
@@ -107,7 +107,7 @@ class GeocodingDataSourceTest {
         val failure = IOException("offline")
         val service = FakeGeocodingService(error = failure)
 
-        val result = GeocodingDataSource(service).searchPlaces("Kyiv")
+        val result = GeocodingDataSource(service).search("Kyiv")
 
         assertTrue(result.isFailure)
         assertSame(failure, result.exceptionOrNull())

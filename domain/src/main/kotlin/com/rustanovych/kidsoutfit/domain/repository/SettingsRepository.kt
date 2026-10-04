@@ -21,6 +21,9 @@ interface SettingsRepository {
     /** Where the forecast location comes from, defaulting to [LocationMode.Auto]. */
     val locationMode: Flow<LocationMode>
 
+    /** Whether the morning outfit reminder is switched on, defaulting to `false`. */
+    val notificationsEnabled: Flow<Boolean>
+
     suspend fun setGender(gender: ChildGender)
 
     /**
@@ -38,4 +41,7 @@ interface SettingsRepository {
     suspend fun setDepartureTime(hour: Int, minute: Int)
 
     suspend fun setLocationMode(mode: LocationMode)
+
+    /** Persists the reminder switch; the actual scheduling is not this repository's concern. */
+    suspend fun setNotificationsEnabled(enabled: Boolean)
 }

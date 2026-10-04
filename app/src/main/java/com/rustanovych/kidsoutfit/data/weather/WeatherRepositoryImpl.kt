@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.IOException
@@ -49,6 +50,9 @@ class WeatherRepositoryImpl(
                 else -> ForecastState.Loading
             }
         }.distinctUntilChanged()
+
+    override fun forecastLocation(): Flow<Coordinates?> =
+        cache.entry.map { it?.coordinates }.distinctUntilChanged()
 
     override suspend fun refresh(force: Boolean): Result<Unit> = refreshLock.withLock {
         val coordinates = resolveCoordinates()

@@ -90,6 +90,23 @@ class DaySegmenterTest {
         assertNull(DaySegmenter.outfitAt(emptyPlan, hour = 10, minute = 0))
     }
 
+    @Test
+    fun `segmentIndexAt mirrors outfitAt and tells a recurring outfit's segments apart`() {
+        val plan = DayPlan(
+            segments = listOf(
+                OutfitSegment(OutfitSet.COLD, startHour = 9),
+                OutfitSegment(OutfitSet.WARM, startHour = 12),
+                OutfitSegment(OutfitSet.COLD, startHour = 15),
+            ),
+            changeWarnings = emptyList(),
+        )
+
+        assertEquals(0, DaySegmenter.segmentIndexAt(plan, hour = 7, minute = 0))
+        assertEquals(1, DaySegmenter.segmentIndexAt(plan, hour = 13, minute = 30))
+        assertEquals(2, DaySegmenter.segmentIndexAt(plan, hour = 15, minute = 0))
+        assertNull(DaySegmenter.segmentIndexAt(DayPlan(emptyList(), emptyList()), hour = 10, minute = 0))
+    }
+
     private fun threeSegmentPlan(): DayPlan = DayPlan(
         segments = listOf(
             OutfitSegment(OutfitSet.COLD, startHour = 9),

@@ -1,6 +1,7 @@
 package com.rustanovych.kidsoutfit.data.network
 
 import com.rustanovych.kidsoutfit.domain.model.Place
+import com.rustanovych.kidsoutfit.domain.repository.PlaceSearch
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.io.IOException
@@ -19,7 +20,7 @@ import java.util.Locale
 class GeocodingDataSource(
     private val service: GeocodingService,
     private val language: () -> String = { Locale.getDefault().language },
-) {
+) : PlaceSearch {
 
     /**
      * Searches places matching [query].
@@ -32,7 +33,7 @@ class GeocodingDataSource(
      * ([HttpException]), or an unreadable payload ([SerializationException]). Coroutine
      * cancellation is not swallowed.
      */
-    suspend fun searchPlaces(query: String): Result<List<Place>> {
+    override suspend fun search(query: String): Result<List<Place>> {
         val term = query.trim()
         if (term.length < GeocodingService.MIN_QUERY_LENGTH) return Result.success(emptyList())
 

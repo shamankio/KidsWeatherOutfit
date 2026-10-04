@@ -41,10 +41,18 @@ object DaySegmenter {
      * is at or before [hour]:[minute], or the first segment if the time is before it starts. `null`
      * when [plan] has no segments.
      */
-    fun outfitAt(plan: DayPlan, hour: Int, minute: Int): OutfitSet? {
+    fun outfitAt(plan: DayPlan, hour: Int, minute: Int): OutfitSet? =
+        segmentIndexAt(plan, hour, minute)?.let { plan.segments[it].outfit }
+
+    /**
+     * Index into [DayPlan.segments] of the segment [outfitAt] resolves to. Needed on top of the set
+     * itself because the same set can recur in a day (cold, cool, cold), so the set cannot identify
+     * the segment. `null` when [plan] has no segments.
+     */
+    fun segmentIndexAt(plan: DayPlan, hour: Int, minute: Int): Int? {
         if (plan.segments.isEmpty()) return null
         val totalMinutes = hour * 60 + minute
-        val active = plan.segments.lastOrNull { it.startHour * 60 <= totalMinutes }
-        return (active ?: plan.segments.first()).outfit
+        val active = plan.segments.indexOfLast { it.startHour * 60 <= totalMinutes }
+        return if (active >= 0) active else 0
     }
 }

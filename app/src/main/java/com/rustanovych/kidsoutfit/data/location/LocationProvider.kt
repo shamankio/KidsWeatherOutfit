@@ -78,7 +78,8 @@ class LocationProvider(private val context: Context) {
         }
     }
 
-    private fun hasCoarseLocationPermission(): Boolean =
+    /** Whether `ACCESS_COARSE_LOCATION` is currently granted; never prompts. */
+    fun hasCoarseLocationPermission(): Boolean =
         ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_COARSE_LOCATION,

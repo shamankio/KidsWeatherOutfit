@@ -1,5 +1,6 @@
 package com.rustanovych.kidsoutfit.domain.repository
 
+import com.rustanovych.kidsoutfit.domain.model.Coordinates
 import com.rustanovych.kidsoutfit.domain.model.ForecastState
 import kotlinx.coroutines.flow.Flow
 
@@ -18,6 +19,12 @@ interface WeatherRepository {
      * outcome. Never throws — failures surface as [ForecastState.Error].
      */
     fun forecast(): Flow<ForecastState>
+
+    /**
+     * Where the cached forecast was fetched for, or `null` when nothing is cached. Lets the UI
+     * name the place for a GPS-resolved forecast, which carries no [com.rustanovych.kidsoutfit.domain.model.Place].
+     */
+    fun forecastLocation(): Flow<Coordinates?>
 
     /**
      * Resolves the target coordinates, fetches a forecast for them, and stores it.

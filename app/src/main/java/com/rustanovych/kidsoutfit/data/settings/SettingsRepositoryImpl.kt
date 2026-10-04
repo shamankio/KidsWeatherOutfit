@@ -2,6 +2,7 @@ package com.rustanovych.kidsoutfit.data.settings
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -31,6 +32,7 @@ private object Keys {
     val PlaceLon = doublePreferencesKey("place_lon")
     val PlaceRegion = stringPreferencesKey("place_region")
     val PlaceCountry = stringPreferencesKey("place_country")
+    val NotificationsEnabled = booleanPreferencesKey("notifications_enabled")
 }
 
 private const val LOCATION_MODE_AUTO = "auto"
@@ -64,6 +66,10 @@ class SettingsRepositoryImpl(
         .map { it.toLocationMode() }
         .distinctUntilChanged()
 
+    override val notificationsEnabled: Flow<Boolean> = preferences
+        .map { it[Keys.NotificationsEnabled] ?: false }
+        .distinctUntilChanged()
+
     override suspend fun setGender(gender: ChildGender) {
         dataStore.edit { it[Keys.Gender] = gender.name }
     }
@@ -78,6 +84,10 @@ class SettingsRepositoryImpl(
             it[Keys.DepartureHour] = hour.coerceIn(DEPARTURE_HOURS)
             it[Keys.DepartureMinute] = minute.coerceIn(DEPARTURE_MINUTES)
         }
+    }
+
+    override suspend fun setNotificationsEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.NotificationsEnabled] = enabled }
     }
 
     override suspend fun setLocationMode(mode: LocationMode) {
