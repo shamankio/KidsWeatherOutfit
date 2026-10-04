@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shared -->
+    <dimen name="screen_horizontal_padding">16dp</dimen>
+    <dimen name="icon_button_size">48dp</dimen>
+    <dimen name="icon_small">20dp</dimen>
+    <dimen name="icon_tiny">16dp</dimen>
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="glass_shadow_elevation">4dp</dimen>
+    <dimen name="glass_border_width">1dp</dimen>
+    <dimen name="card_radius_pill">20dp</dimen>
+
+    <!-- Home: layout rhythm -->
+    <dimen name="home_section_spacing">12dp</dimen>
+    <dimen name="home_top_scrim_height">140dp</dimen>
+    <!-- Breathing room under the last element; the stage 7 ad banner goes in the Scaffold bottomBar slot, below this. -->
+    <dimen name="home_content_bottom_margin">16dp</dimen>
+
+    <!-- Home: header -->
+    <dimen name="home_place_pill_height">40dp</dimen>
+    <dimen name="home_place_pill_max_width">240dp</dimen>
+
+    <!-- Home: weather now -->
+    <dimen name="home_weather_card_padding">12dp</dimen>
+    <dimen name="home_weather_icon_circle">56dp</dimen>
+    <dimen name="home_weather_icon">44dp</dimen>
+
+    <!-- Home: warning banner -->
+    <dimen name="home_banner_radius">20dp</dimen>
+    <dimen name="home_banner_min_height">48dp</dimen>
+    <dimen name="home_banner_icon_tile">36dp</dimen>
+    <dimen name="home_banner_icon_tile_radius">14dp</dimen>
+
+    <!-- Home: hero -->
+    <dimen name="home_hero_halo_width">320dp</dimen>
+    <dimen name="home_hero_pair_overlap">14dp</dimen>
+    <dimen name="home_hero_name_pill_height">34dp</dimen>
+    <dimen name="home_hero_min_height">220dp</dimen>
+
+    <!-- Home: day switcher and strip -->
+    <dimen name="home_day_switcher_height">48dp</dimen>
+    <dimen name="home_day_switcher_padding">4dp</dimen>
+    <dimen name="home_strip_card_width">88dp</dimen>
+    <dimen name="home_strip_card_radius">18dp</dimen>
+    <dimen name="home_strip_card_padding">4dp</dimen>
+    <dimen name="home_strip_thumb_radius">14dp</dimen>
+    <dimen name="home_strip_card_spacing">8dp</dimen>
+    <dimen name="home_strip_border_current">1.5dp</dimen>
+    <dimen name="home_strip_border_selected">3dp</dimen>
+
+    <!-- Home: stale bar and error state -->
+    <dimen name="home_stale_bar_min_height">32dp</dimen>
+    <dimen name="home_error_illustration">210dp</dimen>
+    <dimen name="home_error_icon">150dp</dimen>
+    <dimen name="home_error_halo_inner">16dp</dimen>
+    <dimen name="home_error_halo_outer">36dp</dimen>
+    <dimen name="home_error_text_max_width">280dp</dimen>
+
+    <!-- Home: skeleton -->
+    <dimen name="home_skeleton_temp_width">76dp</dimen>
+    <dimen name="home_skeleton_temp_height">44dp</dimen>
+    <dimen name="home_skeleton_line_long">120dp</dimen>
+    <dimen name="home_skeleton_line_short">96dp</dimen>
+    <dimen name="home_skeleton_line_height">12dp</dimen>
+    <dimen name="home_skeleton_head">92dp</dimen>
+    <dimen name="home_skeleton_body_width">150dp</dimen>
+    <dimen name="home_skeleton_body_height">130dp</dimen>
+    <dimen name="home_skeleton_pill_width">170dp</dimen>
+    <dimen name="home_skeleton_pill_height">34dp</dimen>
+    <dimen name="home_skeleton_strip_height">116dp</dimen>
+</resources>

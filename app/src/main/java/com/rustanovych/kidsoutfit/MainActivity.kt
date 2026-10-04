@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.rustanovych.kidsoutfit.ui.home.HomeScreen
+import com.rustanovych.kidsoutfit.ui.home.HomeRoute
 import com.rustanovych.kidsoutfit.ui.navigation.HomeKey
 import com.rustanovych.kidsoutfit.ui.navigation.SettingsKey
 import com.rustanovych.kidsoutfit.ui.navigation.SplashKey
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                     onBack = { backStack.removeLastOrNull() },
                     entryProvider = entryProvider {
                         entry<SplashKey> { SplashScreen() }
-                        entry<HomeKey> { HomeScreen() }
+                        entry<HomeKey> { HomeRoute(onOpenSettings = { backStack.add(SettingsKey) }) }
                         entry<SettingsKey> { SettingsScreen() }
                     },
                 )

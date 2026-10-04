@@ -8,4 +8,45 @@
     <string name="format_temperature">%1$d°</string>
     <string name="format_wind">%1$d km/h</string>
     <string name="format_precipitation">%1$.1f mm</string>
+
+    <!-- Home -->
+    <string name="home_location_current">Current location</string>
+    <string name="home_settings_button">Settings</string>
+    <string name="home_feels_like">Feels like %1$s</string>
+    <string name="home_wind">Wind</string>
+    <string name="home_precipitation">Precipitation</string>
+    <string name="home_day_today">Today</string>
+    <string name="home_day_tomorrow">Tomorrow</string>
+    <string name="home_day_switcher_label">Day</string>
+    <string name="home_segment_from">from %1$s</string>
+    <string name="home_segment_selected">Selected</string>
+    <string name="home_segment_current">Now</string>
+    <string name="home_stale_with_time">Data may be outdated · updated %1$s</string>
+    <string name="home_stale">Data may be outdated</string>
+    <string name="home_refresh">Refresh</string>
+    <string name="home_error_title">Couldn\'t load the weather</string>
+    <string name="home_error_body">Check your internet connection. Your outfit tips will be back in a moment.</string>
+    <string name="home_error_retry">Try again</string>
+
+    <!-- Warning banner: %1$s = time, %2$s = outfit set name -->
+    <string name="advice_warmer">At %1$s it gets warmer — %2$s</string>
+    <string name="advice_colder">At %1$s it gets colder — %2$s</string>
+    <string name="advice_rain_starts">At %1$s rain starts — %2$s</string>
+    <string name="advice_rain_stops">At %1$s rain stops — %2$s</string>
+    <string name="advice_snow_starts">At %1$s snow starts — %2$s</string>
+    <string name="advice_wind_starts">At %1$s wind picks up — %2$s</string>
+
+    <!-- Outfit set display names -->
+    <string name="outfit_name_heat">Hot weather outfit</string>
+    <string name="outfit_name_warm">Warm weather outfit</string>
+    <string name="outfit_name_warm_rain">Warm rain outfit</string>
+    <string name="outfit_name_cool">Cool weather outfit</string>
+    <string name="outfit_name_cool_rain">Cool rain outfit</string>
+    <string name="outfit_name_wind">Windy weather outfit</string>
+    <string name="outfit_name_cold">Cold weather outfit</string>
+    <string name="outfit_name_cold_rain">Cold rain outfit</string>
+    <string name="outfit_name_winter_light">Light winter outfit</string>
+    <string name="outfit_name_frost_hard">Hard frost outfit</string>
+    <string name="outfit_name_snowfall">Snowfall outfit</string>
+    <string name="outfit_name_rain_wind">Rain and wind outfit</string>
 </resources>

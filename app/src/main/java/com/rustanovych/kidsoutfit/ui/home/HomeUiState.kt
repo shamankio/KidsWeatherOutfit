@@ -38,7 +38,19 @@ data class HomeUiState(
     val isStale: Boolean = false,
     val updatedAtLabel: String? = null,
     val error: Boolean = false,
-)
+) {
+    /** The segment the hero shows: the tapped one, else the one active at departure. */
+    val shownSegmentIndex: Int?
+        get() = selectedSegmentIndex ?: segments.indexOfFirst { it.isCurrent }.takeIf { it >= 0 }
+
+    /**
+     * The next change after the shown segment — what a parent still needs to plan for. The advice
+     * at position `i` is the change from segment `i` to `i + 1`, so it is the one at the shown
+     * index itself. `null` on the last segment: nothing is left to warn about.
+     */
+    val upcomingAdvice: AdviceUi?
+        get() = shownSegmentIndex?.let { advices.getOrNull(it) }
+}
 
 /** @property timeLabel Start of the segment, e.g. `09:00`. */
 data class SegmentUi(
