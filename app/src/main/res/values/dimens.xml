@@ -6,7 +6,8 @@
     <dimen name="icon_small">20dp</dimen>
     <dimen name="icon_tiny">16dp</dimen>
     <dimen name="button_height">56dp</dimen>
-    <dimen name="glass_shadow_elevation">4dp</dimen>
+    <!-- Zero on purpose: the platform draws a shadow beneath a translucent surface, so it shows through as pale boxes behind the text. The 1 dp border carries the edge instead. -->
+    <dimen name="glass_shadow_elevation">0dp</dimen>
     <dimen name="glass_border_width">1dp</dimen>
     <dimen name="card_radius_pill">20dp</dimen>
 

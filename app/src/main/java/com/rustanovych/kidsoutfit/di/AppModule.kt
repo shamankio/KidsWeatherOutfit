@@ -9,6 +9,7 @@ import com.rustanovych.kidsoutfit.domain.repository.PlaceSearch
 import com.rustanovych.kidsoutfit.ui.format.AndroidDisplayFormatter
 import com.rustanovych.kidsoutfit.ui.format.DisplayFormatter
 import com.rustanovych.kidsoutfit.ui.home.HomeViewModel
+import com.rustanovych.kidsoutfit.ui.splash.SplashViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -28,6 +29,14 @@ val appModule = module {
             settingsRepository = get(),
             placeNameResolver = get(),
             formatter = get(),
+        )
+    }
+
+    viewModel {
+        SplashViewModel(
+            weatherRepository = get(),
+            settingsRepository = get(),
+            locationPermission = get(),
         )
     }
 }

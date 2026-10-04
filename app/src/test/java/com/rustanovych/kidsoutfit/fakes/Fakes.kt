@@ -106,3 +106,7 @@ fun snapshots(hours: IntRange, apparent: Double, weatherCode: Int = 0): List<Wea
             uvIndex = 0.0,
         )
     }
+
+class FakeLocationPermission(var granted: Boolean = false) : com.rustanovych.kidsoutfit.data.location.LocationPermission {
+    override fun isGranted(): Boolean = granted
+}

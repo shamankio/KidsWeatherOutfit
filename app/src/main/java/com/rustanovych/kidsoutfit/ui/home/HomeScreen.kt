@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,7 +45,7 @@ import com.rustanovych.kidsoutfit.ui.home.components.WeatherNowCard
 import com.rustanovych.kidsoutfit.ui.theme.LocalGlassColors
 import org.koin.androidx.compose.koinViewModel
 
-/** How much of the screen height the character takes. */
+/** How much of the usable screen height the character takes. */
 private const val HERO_HEIGHT_FRACTION = 0.45f
 private const val BACKGROUND_CROSSFADE_MS = 600
 
@@ -85,7 +88,10 @@ fun HomeContent(
     val spacing = dimensionResource(R.dimen.home_section_spacing)
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val heroHeight = (maxHeight * HERO_HEIGHT_FRACTION).coerceAtLeast(dimensionResource(R.dimen.home_hero_min_height))
+        // 45% of what the app can actually draw in: the status and navigation bars are not ours.
+        val insets = WindowInsets.safeDrawing.asPaddingValues()
+        val usableHeight = maxHeight - insets.calculateTopPadding() - insets.calculateBottomPadding()
+        val heroHeight = (usableHeight * HERO_HEIGHT_FRACTION).coerceAtLeast(dimensionResource(R.dimen.home_hero_min_height))
 
         HomeBackground(state)
         Box(

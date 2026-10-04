@@ -10,5 +10,9 @@ data object SplashKey : NavKey
 @Serializable
 data object HomeKey : NavKey
 
+/**
+ * @property focusCitySearch Open with the manual location selected and the city search focused —
+ * where onboarding sends a user who declined the location permission.
+ */
 @Serializable
-data object SettingsKey : NavKey
+data class SettingsKey(val focusCitySearch: Boolean = false) : NavKey
