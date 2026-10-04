@@ -29,3 +29,7 @@ keystore.properties
 .claude/settings.local.json
 CLAUDE.md
 progress.md
+
+# Asset tooling
+tools/assets/.venv/
+tools/assets/out/
