@@ -8,7 +8,6 @@ import com.rustanovych.kidsoutfit.domain.model.ChildProfile
 import com.rustanovych.kidsoutfit.domain.model.DayPlan
 import com.rustanovych.kidsoutfit.domain.model.ForecastBundle
 import com.rustanovych.kidsoutfit.domain.model.ForecastState
-import com.rustanovych.kidsoutfit.domain.model.LocationMode
 import com.rustanovych.kidsoutfit.domain.model.WeatherSnapshot
 import com.rustanovych.kidsoutfit.domain.repository.PlaceNameResolver
 import com.rustanovych.kidsoutfit.domain.repository.SettingsRepository
@@ -16,18 +15,12 @@ import com.rustanovych.kidsoutfit.domain.repository.WeatherRepository
 import com.rustanovych.kidsoutfit.ui.assets.backgroundFor
 import com.rustanovych.kidsoutfit.ui.assets.outfitDrawables
 import com.rustanovych.kidsoutfit.ui.assets.weatherIcon
+import com.rustanovych.kidsoutfit.ui.common.forecastPlaceName
 import com.rustanovych.kidsoutfit.ui.format.DisplayFormatter
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -43,7 +36,6 @@ private const val STATE_SUBSCRIPTION_TIMEOUT_MS = 5_000L
  *
  * @param now Injected so "current hour" can be pinned in tests.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
     private val weatherRepository: WeatherRepository,
     private val settingsRepository: SettingsRepository,
@@ -64,7 +56,7 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = combine(
         weatherRepository.forecast(),
         settingsRepository.profile,
-        locationName(),
+        forecastPlaceName(settingsRepository, weatherRepository, placeNameResolver),
         selection,
         isRefreshing,
     ) { forecast, profile, locationName, selection, refreshing ->
@@ -100,26 +92,6 @@ class HomeViewModel(
             }
         }
     }
-
-    /**
-     * The header's place name. A picked city names itself; for GPS the cached forecast's
-     * coordinates are reverse-geocoded. Emits `null` first so the screen never waits on the
-     * geocoder.
-     */
-    private fun locationName(): Flow<String?> =
-        settingsRepository.locationMode.flatMapLatest { mode ->
-            when (mode) {
-                is LocationMode.Manual -> flowOf<String?>(mode.place.name)
-                LocationMode.Auto -> flow<String?> {
-                    emit(null)
-                    emitAll(
-                        weatherRepository.forecastLocation().mapLatest { coordinates ->
-                            coordinates?.let { placeNameResolver.nameFor(it) }
-                        },
-                    )
-                }
-            }
-        }
 
     private fun buildState(
         forecast: ForecastState,

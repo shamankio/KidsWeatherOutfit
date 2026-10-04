@@ -19,12 +19,17 @@ import kotlinx.coroutines.flow.update
 
 class FakeWeatherRepository(
     initial: ForecastState = ForecastState.Loading,
+    /** When given, the stored location mode is sampled on every [refresh], like the real repository does. */
+    private val settings: FakeSettingsRepository? = null,
 ) : WeatherRepository {
     val state = MutableStateFlow(initial)
     val location = MutableStateFlow<Coordinates?>(null)
 
     /** The `force` argument of every [refresh] call, in order. */
     val refreshCalls = mutableListOf<Boolean>()
+
+    /** The stored location mode at the moment of each [refresh]; needs [settings]. */
+    val modeAtRefresh = mutableListOf<LocationMode?>()
     var refreshResult: Result<Unit> = Result.success(Unit)
 
     override fun forecast(): Flow<ForecastState> = state
@@ -33,6 +38,7 @@ class FakeWeatherRepository(
 
     override suspend fun refresh(force: Boolean): Result<Unit> {
         refreshCalls += force
+        modeAtRefresh += settings?.locationModeState?.value
         return refreshResult
     }
 }

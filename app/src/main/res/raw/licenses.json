@@ -1,0 +1,12 @@
+[
+  {"name": "Jetpack Compose, Material 3, AndroidX", "license": "Apache License 2.0", "url": "https://developer.android.com/jetpack"},
+  {"name": "Navigation 3", "license": "Apache License 2.0", "url": "https://developer.android.com/jetpack/androidx/releases/navigation3"},
+  {"name": "Koin", "license": "Apache License 2.0", "url": "https://insert-koin.io"},
+  {"name": "Retrofit and OkHttp", "license": "Apache License 2.0", "url": "https://square.github.io/retrofit"},
+  {"name": "kotlinx.serialization and kotlinx.coroutines", "license": "Apache License 2.0", "url": "https://github.com/Kotlin/kotlinx.serialization"},
+  {"name": "Coil", "license": "Apache License 2.0", "url": "https://coil-kt.github.io/coil"},
+  {"name": "Google Play services Location", "license": "Android Software Development Kit License", "url": "https://developers.google.com/android/guides/overview"},
+  {"name": "Nunito typeface", "license": "SIL Open Font License 1.1", "url": "https://fonts.google.com/specimen/Nunito"},
+  {"name": "Material Symbols icons", "license": "Apache License 2.0", "url": "https://fonts.google.com/icons"},
+  {"name": "Open-Meteo weather and geocoding data", "license": "CC BY 4.0", "url": "https://open-meteo.com"}
+]

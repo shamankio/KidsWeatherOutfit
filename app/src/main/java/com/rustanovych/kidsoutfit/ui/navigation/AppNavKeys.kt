@@ -16,3 +16,6 @@ data object HomeKey : NavKey
  */
 @Serializable
 data class SettingsKey(val focusCitySearch: Boolean = false) : NavKey
+
+@Serializable
+data object LicensesKey : NavKey

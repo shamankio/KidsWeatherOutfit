@@ -37,6 +37,9 @@ class GlassColors(
     val pageBottom: Color,
     /** Soft light behind the character, so it reads on any background. */
     val halo: Color,
+    /** Plain backdrop and card of the settings-style screens, which have no weather picture. */
+    val settingsBackground: Color,
+    val settingsCard: Color,
     /** Fades the top of a background so status-bar content stays readable over it. */
     val scrim: Color,
 )
@@ -61,6 +64,8 @@ val LightGlassColors = GlassColors(
     pageBottom = Color(0xFFF4F8FA),
     halo = Color.White,
     scrim = Color(0x80FFFFFF),
+    settingsBackground = Color(0xFFF2F7FA),
+    settingsCard = Color.White,
 )
 
 val DarkGlassColors = GlassColors(
@@ -83,6 +88,8 @@ val DarkGlassColors = GlassColors(
     pageBottom = Color(0xFF1E2A33),
     halo = Color(0xB3FFFFFF),
     scrim = Color(0x66000000),
+    settingsBackground = Color(0xFF101418),
+    settingsCard = Color(0xFF1B2128),
 )
 
 val LocalGlassColors = staticCompositionLocalOf { LightGlassColors }

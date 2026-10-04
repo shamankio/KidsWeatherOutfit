@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Kids Weather Outfit</string>
-    <string name="settings_screen_title">Settings</string>
 
     <!-- Number formats used by DisplayFormatter -->
     <string name="format_temperature">%1$d°</string>
@@ -54,4 +53,42 @@
     <string name="onboarding_allow_location">Allow location</string>
     <string name="onboarding_enter_city">Enter city manually</string>
     <string name="splash_loading_body">Getting your forecast…</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_back">Back</string>
+    <string name="settings_section_child">Child</string>
+    <string name="settings_gender_boy">Boy</string>
+    <string name="settings_gender_girl">Girl</string>
+    <string name="settings_gender_both">Both</string>
+    <string name="settings_sensitivity_title">Temperature feel</string>
+    <string name="settings_sensitivity_runs_hot">Runs hot</string>
+    <string name="settings_sensitivity_gets_cold">Gets cold easily</string>
+    <string name="settings_sensitivity_warmer">+%1$d°: dressing warmer</string>
+    <string name="settings_sensitivity_lighter">−%1$d°: dressing lighter</string>
+    <string name="settings_sensitivity_neutral">0°: standard outfits</string>
+    <string name="settings_sensitivity_caption_neutral">Outfits follow the forecast as-is.</string>
+    <string name="settings_sensitivity_caption_colder">We pick outfits as if it were %1$d° colder than the forecast.</string>
+    <string name="settings_sensitivity_caption_warmer">We pick outfits as if it were %1$d° warmer than the forecast.</string>
+    <string name="settings_section_departure">Departure time</string>
+    <string name="settings_leaves_home">Leaves home at</string>
+    <string name="settings_time_ok">OK</string>
+    <string name="settings_time_cancel">Cancel</string>
+    <string name="settings_section_location">Location</string>
+    <string name="settings_location_auto">Automatic (GPS)</string>
+    <string name="settings_location_manual">Choose a city</string>
+    <string name="settings_location_manual_hint">Search by name</string>
+    <string name="settings_city_search">Search city</string>
+    <string name="settings_city_clear">Clear</string>
+    <string name="settings_city_searching">Searching…</string>
+    <string name="settings_city_no_results">No cities match \"%1$s\"</string>
+    <string name="settings_city_search_failed">Couldn\'t search. Check your connection.</string>
+    <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_reminder_title">Morning outfit reminder</string>
+    <string name="settings_reminder_caption">30 minutes before departure</string>
+    <string name="settings_reminder_caption_at">30 minutes before departure · %1$s</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_app_version">App version</string>
+    <string name="settings_licenses">Open source licenses</string>
+    <string name="licenses_title">Open source licenses</string>
 </resources>

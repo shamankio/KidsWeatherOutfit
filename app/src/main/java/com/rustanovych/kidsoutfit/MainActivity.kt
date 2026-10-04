@@ -12,9 +12,11 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.rustanovych.kidsoutfit.ui.home.HomeRoute
 import com.rustanovych.kidsoutfit.ui.navigation.HomeKey
+import com.rustanovych.kidsoutfit.ui.navigation.LicensesKey
 import com.rustanovych.kidsoutfit.ui.navigation.SettingsKey
 import com.rustanovych.kidsoutfit.ui.navigation.SplashKey
-import com.rustanovych.kidsoutfit.ui.settings.SettingsScreen
+import com.rustanovych.kidsoutfit.ui.licenses.LicensesScreen
+import com.rustanovych.kidsoutfit.ui.settings.SettingsRoute
 import com.rustanovych.kidsoutfit.ui.splash.SplashRoute
 import com.rustanovych.kidsoutfit.ui.theme.KidsWeatherOutfitTheme
 
@@ -46,7 +48,14 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         entry<HomeKey> { HomeRoute(onOpenSettings = { backStack.add(SettingsKey()) }) }
-                        entry<SettingsKey> { SettingsScreen() }
+                        entry<SettingsKey> { key ->
+                            SettingsRoute(
+                                focusCitySearch = key.focusCitySearch,
+                                onBack = { backStack.removeLastOrNull() },
+                                onOpenLicenses = { backStack.add(LicensesKey) },
+                            )
+                        }
+                        entry<LicensesKey> { LicensesScreen(onBack = { backStack.removeLastOrNull() }) }
                     },
                 )
             }
