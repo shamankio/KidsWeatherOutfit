@@ -1,8 +1,8 @@
 source_filename,weather
 bg_sunny_fixed.png,sunny
 bg_cloudy.webp,cloudy
-bg_rain.webp,rain
-bg_storm.webp,storm
+bg_rain_fixed.png,rain
+bg_storm_fixed.png,storm
 bg_snow.webp,snow
 bg_frost.webp,frost
 bg_wind.webp,wind

@@ -57,3 +57,21 @@ card is ~7 px wider than the image on each side; ignoring that leaves a bright w
 also rings around the sharp edge, so a thin band (+-5 px) along the old boundary is re-interpolated from the clean pixels on
 both sides, along the edge normal. Checked by: edge-row residual < 1.5 levels, and the old edge zone being no noisier than
 untouched grass.
+
+## Softening bg_storm and calming bg_rain
+
+```bash
+tools/assets/.venv/bin/python tools/assets/calm_backgrounds.py storm   # -> design/raw_backgrounds/bg_storm_fixed.png
+tools/assets/.venv/bin/python tools/assets/calm_backgrounds.py rain    # -> design/raw_backgrounds/bg_rain_fixed.png
+```
+
+Both are processed from the raw render (which stays untouched) and print the number they are judged by:
+
+- **storm**: the cloud base was a ruler-straight warm-brown line. It is blended with a vertically blurred copy under a
+  noise-warped mask, plus a faint haze that fades in smoothly (a hard haze start leaves its own visible line). Largest
+  row-to-row luminance step in the seam window: 4.05 -> 0.81 (target < 1.5); everything outside the window is unchanged.
+- **rain**: the bottom third had ~20x the detail of the top (vertical-gradient energy 5.1 vs 0.24), which fights UI placed
+  there. Progressive blur (0 -> 16 px from row 1700 down) and a pull toward the local mean colour. Bottom-third energy
+  5.12 -> 0.77 (target <= 1.0); rows above 1700 are bit-identical; puddles stay as soft lilac patches.
+
+`bg_mapping.csv` points `storm` and `rain` at these `*_fixed.png` files, like `sunny`.
