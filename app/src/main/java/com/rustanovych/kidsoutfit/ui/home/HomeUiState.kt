@@ -1,6 +1,7 @@
 package com.rustanovych.kidsoutfit.ui.home
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.rustanovych.kidsoutfit.R
 import com.rustanovych.kidsoutfit.domain.engine.Direction
 import com.rustanovych.kidsoutfit.domain.model.ChildGender
@@ -72,6 +73,7 @@ data class WeatherNowUi(
     val temperatureLabel: String,
     val apparentLabel: String,
     @DrawableRes val iconRes: Int,
+    @StringRes val conditionRes: Int,
     val windLabel: String,
     val precipitationLabel: String,
 )

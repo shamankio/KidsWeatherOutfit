@@ -22,10 +22,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.rustanovych.kidsoutfit.R
+import com.rustanovych.kidsoutfit.ui.assets.outfitNameRes
 import com.rustanovych.kidsoutfit.ui.components.GlassSurface
 import com.rustanovych.kidsoutfit.ui.components.OutfitThumbnail
 import com.rustanovych.kidsoutfit.ui.home.SegmentUi
@@ -74,10 +81,29 @@ private fun SegmentCard(segment: SegmentUi, selected: Boolean, onClick: () -> Un
     val glass = LocalGlassColors.current
     val shape = RoundedCornerShape(dimensionResource(R.dimen.home_strip_card_radius))
     val highlighted = selected || segment.isCurrent
+    val from = stringResource(R.string.home_segment_from, segment.timeLabel)
+    val description = stringResource(
+        R.string.home_segment_description,
+        stringResource(outfitNameRes(segment.outfit)),
+        from,
+    )
+    val stateText = when {
+        selected -> stringResource(R.string.home_segment_selected)
+        segment.isCurrent -> stringResource(R.string.home_segment_current)
+        else -> null
+    }
     GlassSurface(
         modifier = Modifier
             .width(dimensionResource(R.dimen.home_strip_card_width))
-            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            // The card reads as one thing: the outfit and the time, not a picture and a number.
+            .clearAndSetSemantics {
+                contentDescription = description
+                stateText?.let { stateDescription = it }
+                role = Role.RadioButton
+                this.selected = selected
+                onClick { onClick(); true }
+            },
         shape = shape,
         color = if (highlighted) glass.accentSoft else glass.card,
         // Selected is a thick solid accent rim, current a thinner softer one: told apart by width
@@ -104,7 +130,7 @@ private fun SegmentCard(segment: SegmentUi, selected: Boolean, onClick: () -> Un
                 modifier = Modifier.fillMaxWidth(),
             )
             Text(
-                text = stringResource(R.string.home_segment_from, segment.timeLabel),
+                text = from,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = if (selected) FontWeight.Black else FontWeight.Bold,
                 textAlign = TextAlign.Center,

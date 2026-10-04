@@ -42,4 +42,9 @@ class WeatherIconAssetsTest {
             assertEquals("code $code", R.drawable.ic_weather_cloudy, weatherIcon(code))
         }
     }
+
+    @Test
+    fun `every WMO code has a condition description`() {
+        for (code in 0..99) assertNotEquals("code $code", 0, weatherConditionRes(code))
+    }
 }

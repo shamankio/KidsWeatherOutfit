@@ -124,8 +124,12 @@ fun SplashContent(
                 }
             }
 
-            else -> OnboardingContent(
-                loading = state != SplashUiState.NeedsLocation,
+            // Nothing yet: a returning user is about to be sent to Home, and a flash of
+            // onboarding text or a spinner for a few milliseconds would only be noise.
+            SplashUiState.Checking, SplashUiState.Done -> Unit
+
+            SplashUiState.NeedsLocation, SplashUiState.Loading -> OnboardingContent(
+                loading = state == SplashUiState.Loading,
                 onAllowLocation = onAllowLocation,
                 onEnterCity = onEnterCity,
             )
@@ -244,7 +248,7 @@ private fun Illustration() {
     ) {
         Image(
             painter = painterResource(outfitDrawable(OutfitSet.COLD_RAIN, ChildGender.GIRL)),
-            contentDescription = null,
+            contentDescription = stringResource(R.string.onboarding_illustration),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 12.dp, bottom = 8.dp),
@@ -268,4 +272,10 @@ private fun SplashLoadingPreview() {
 @Composable
 private fun SplashErrorPreview() {
     KidsWeatherOutfitTheme { SplashContent(SplashUiState.Error, {}, {}, {}) }
+}
+
+@Preview(name = "Needs location, font 2.0", widthDp = 360, heightDp = 800, fontScale = 2f)
+@Composable
+private fun SplashFont20Preview() {
+    KidsWeatherOutfitTheme { SplashContent(SplashUiState.NeedsLocation, {}, {}, {}) }
 }

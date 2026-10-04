@@ -14,6 +14,7 @@ import com.rustanovych.kidsoutfit.domain.repository.SettingsRepository
 import com.rustanovych.kidsoutfit.domain.repository.WeatherRepository
 import com.rustanovych.kidsoutfit.ui.assets.backgroundFor
 import com.rustanovych.kidsoutfit.ui.assets.outfitDrawables
+import com.rustanovych.kidsoutfit.ui.assets.weatherConditionRes
 import com.rustanovych.kidsoutfit.ui.assets.weatherIcon
 import com.rustanovych.kidsoutfit.ui.common.forecastPlaceName
 import com.rustanovych.kidsoutfit.ui.format.DisplayFormatter
@@ -177,6 +178,7 @@ class HomeViewModel(
         temperatureLabel = formatter.temperature(snapshot.temperature),
         apparentLabel = formatter.temperature(snapshot.apparentTemperature),
         iconRes = weatherIcon(snapshot.weatherCode),
+        conditionRes = weatherConditionRes(snapshot.weatherCode),
         windLabel = formatter.wind(snapshot.windSpeedKmh),
         precipitationLabel = formatter.precipitation(snapshot.precipitationMm),
     )

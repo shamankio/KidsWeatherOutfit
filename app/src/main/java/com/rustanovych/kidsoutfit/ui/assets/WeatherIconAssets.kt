@@ -1,6 +1,7 @@
 package com.rustanovych.kidsoutfit.ui.assets
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.rustanovych.kidsoutfit.R
 
 /*
@@ -21,4 +22,20 @@ fun weatherIcon(weatherCode: Int): Int = when (weatherCode) {
     86 -> R.drawable.ic_weather_heavy_snow
     95, 96, 99 -> R.drawable.ic_weather_thunderstorms
     else -> R.drawable.ic_weather_cloudy
+}
+
+/** What the icon of [weatherCode] means in words, for the icon's content description. */
+@StringRes
+fun weatherConditionRes(weatherCode: Int): Int = when (weatherCode) {
+    0 -> R.string.weather_condition_clear
+    1, 2 -> R.string.weather_condition_partly_cloudy
+    3 -> R.string.weather_condition_cloudy
+    45, 48 -> R.string.weather_condition_fog
+    51, 53, 55 -> R.string.weather_condition_drizzle
+    56, 57, 66, 67 -> R.string.weather_condition_sleet
+    61, 63, 65, 80, 81, 82 -> R.string.weather_condition_rain
+    71, 73, 75, 77, 85 -> R.string.weather_condition_snow
+    86 -> R.string.weather_condition_heavy_snow
+    95, 96, 99 -> R.string.weather_condition_thunderstorm
+    else -> R.string.weather_condition_cloudy
 }

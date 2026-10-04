@@ -58,6 +58,7 @@ internal object HomePreviewData {
                 temperatureLabel = "18°",
                 apparentLabel = "16°",
                 iconRes = iconRes,
+                conditionRes = R.string.weather_condition_partly_cloudy,
                 windLabel = "12 km/h",
                 precipitationLabel = "0.5 mm",
             ),

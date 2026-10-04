@@ -36,6 +36,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.rustanovych.kidsoutfit.R
@@ -50,6 +52,8 @@ private const val HERO_ENTER_SCALE = 0.92f
 /**
  * The large illustration of the child (or both children) with the outfit name below.
  *
+ * @param description What a screen reader says for the illustration.
+ *
  * Both figures are drawn with [ContentScale.Fit]: whatever the space, the characters shrink rather
  * than being cropped, so a pair stays fully visible top to bottom. Pass a fixed height in
  * [modifier]; the hero itself does not decide how tall it is.
@@ -58,6 +62,7 @@ private const val HERO_ENTER_SCALE = 0.92f
 fun HeroCharacter(
     @DrawableRes outfits: List<Int>,
     outfitLabel: OutfitSet,
+    description: String,
     modifier: Modifier = Modifier,
 ) {
     val glass = LocalGlassColors.current
@@ -95,7 +100,10 @@ fun HeroCharacter(
                         )
                 },
                 label = "heroFigures",
-                modifier = Modifier.fillMaxSize(),
+                // One description for the whole group, not one per figure: a pair is read as a pair.
+                modifier = Modifier
+                    .fillMaxSize()
+                    .semantics { contentDescription = description },
             ) { drawables ->
                 Figures(drawables)
             }

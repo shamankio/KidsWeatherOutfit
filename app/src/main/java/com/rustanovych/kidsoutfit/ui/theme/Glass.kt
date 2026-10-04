@@ -52,7 +52,7 @@ val LightGlassColors = GlassColors(
     accent = Color(0xFF4FC3F7),
     onAccent = Color(0xFF0B2A3F),
     accentSoft = Color(0xFFE1F5FE),
-    link = Color(0xFF0277BD),
+    link = Color(0xFF01579B),
     amberContainer = Color(0xE6FFECB3),
     amberBorder = Color(0x99FFD54F),
     onAmber = Color(0xFF4A3500),
@@ -87,7 +87,8 @@ val DarkGlassColors = GlassColors(
     pageTop = Color(0xFF14212B),
     pageBottom = Color(0xFF1E2A33),
     halo = Color(0xB3FFFFFF),
-    scrim = Color(0x66000000),
+    // Light in the dark theme too: Home keeps dark status-bar icons over every background.
+    scrim = Color(0x80FFFFFF),
     settingsBackground = Color(0xFF101418),
     settingsCard = Color(0xFF1B2128),
 )

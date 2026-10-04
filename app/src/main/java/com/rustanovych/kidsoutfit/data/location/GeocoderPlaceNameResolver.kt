@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
+import androidx.annotation.RequiresApi
 import com.rustanovych.kidsoutfit.domain.model.Coordinates
 import com.rustanovych.kidsoutfit.domain.repository.PlaceNameResolver
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,7 @@ class GeocoderPlaceNameResolver(private val context: Context) : PlaceNameResolve
         return address?.let { it.locality ?: it.subAdminArea ?: it.adminArea }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private suspend fun fetchAsync(geocoder: Geocoder, coordinates: Coordinates): Address? =
         suspendCancellableCoroutine { continuation ->
             geocoder.getFromLocation(

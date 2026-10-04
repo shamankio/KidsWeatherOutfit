@@ -74,7 +74,7 @@ fun WeatherNowCard(weather: WeatherNowUi, modifier: Modifier = Modifier) {
             ) {
                 Image(
                     painter = painterResource(weather.iconRes),
-                    contentDescription = null,
+                    contentDescription = stringResource(weather.conditionRes),
                     modifier = Modifier.size(dimensionResource(R.dimen.home_weather_icon)),
                 )
             }

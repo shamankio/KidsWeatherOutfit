@@ -21,10 +21,13 @@ import kotlinx.coroutines.launch
 /** What the screen after the system splash is showing. */
 sealed interface SplashUiState {
 
+    /** Reading the cache and settings to decide; usually over in a blink, so it draws nothing. */
+    data object Checking : SplashUiState
+
     /** First launch with no way to find the user's city yet: explain, then ask. */
     data object NeedsLocation : SplashUiState
 
-    /** Fetching the first forecast. */
+    /** Fetching the first forecast: the only state that shows a spinner. */
     data object Loading : SplashUiState
 
     /** Ready: go to Home. */
@@ -59,7 +62,7 @@ class SplashViewModel(
     private val locationPermission: LocationPermission,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<SplashUiState>(SplashUiState.Loading)
+    private val _uiState = MutableStateFlow<SplashUiState>(SplashUiState.Checking)
     val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()
 
     private val _effects = Channel<SplashEffect>(Channel.BUFFERED)

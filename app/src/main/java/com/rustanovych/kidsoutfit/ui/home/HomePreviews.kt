@@ -71,6 +71,40 @@ private fun HomeLoadingPreview() = PreviewHome(HomePreviewData.loading)
 @Composable
 private fun HomeErrorPreview() = PreviewHome(HomePreviewData.error)
 
+// Contrast: the same cards over the brightest, the darkest and a pale-and-busy background.
+@Preview(name = "Contrast: sunny", widthDp = PHONE_WIDTH, heightDp = PHONE_HEIGHT)
+@Composable
+private fun HomeOverSunnyPreview() = PreviewHome(HomePreviewData.loaded(backgroundRes = R.drawable.bg_sunny))
+
+@Preview(name = "Contrast: storm", widthDp = PHONE_WIDTH, heightDp = PHONE_HEIGHT)
+@Composable
+private fun HomeOverStormPreview() = PreviewHome(
+    HomePreviewData.loaded(backgroundRes = R.drawable.bg_storm, iconRes = R.drawable.ic_weather_thunderstorms),
+)
+
+@Preview(name = "Contrast: snow", widthDp = PHONE_WIDTH, heightDp = PHONE_HEIGHT)
+@Composable
+private fun HomeOverSnowPreview() = PreviewHome(
+    HomePreviewData.loaded(backgroundRes = R.drawable.bg_snow, iconRes = R.drawable.ic_weather_snow),
+)
+
+@Preview(name = "Contrast: storm, dark", widthDp = PHONE_WIDTH, heightDp = PHONE_HEIGHT, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+private fun HomeOverStormDarkPreview() = PreviewHome(HomePreviewData.loaded(backgroundRes = R.drawable.bg_storm))
+
+// Large fonts: nothing may clip, the page scrolls instead.
+@Preview(name = "Font 1.5", widthDp = PHONE_WIDTH, heightDp = PHONE_HEIGHT, fontScale = 1.5f)
+@Composable
+private fun HomeFont15Preview() = PreviewHome(HomePreviewData.loaded())
+
+@Preview(name = "Font 2.0", widthDp = PHONE_WIDTH, heightDp = PHONE_HEIGHT, fontScale = 2f)
+@Composable
+private fun HomeFont20Preview() = PreviewHome(HomePreviewData.loaded())
+
+@Preview(name = "Font 2.0, stale", widthDp = PHONE_WIDTH, heightDp = PHONE_HEIGHT, fontScale = 2f)
+@Composable
+private fun HomeFont20StalePreview() = PreviewHome(HomePreviewData.stale)
+
 /**
  * All 12 sets at the real card size, 4 per row (a preview cannot scroll), to judge whether the
  * upper-body crop is enough to tell the sets apart.

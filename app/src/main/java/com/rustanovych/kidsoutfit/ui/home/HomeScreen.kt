@@ -1,7 +1,7 @@
 package com.rustanovych.kidsoutfit.ui.home
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,15 +24,19 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rustanovych.kidsoutfit.R
+import com.rustanovych.kidsoutfit.ui.assets.outfitDescription
+import com.rustanovych.kidsoutfit.ui.components.StatusBarIcons
 import com.rustanovych.kidsoutfit.ui.home.components.AdviceBanner
 import com.rustanovych.kidsoutfit.ui.home.components.DaySwitcher
 import com.rustanovych.kidsoutfit.ui.home.components.HeroCharacter
@@ -48,6 +52,7 @@ import org.koin.androidx.compose.koinViewModel
 /** How much of the usable screen height the character takes. */
 private const val HERO_HEIGHT_FRACTION = 0.45f
 private const val BACKGROUND_CROSSFADE_MS = 600
+private const val BANNER_FADE_MS = 200
 
 @Composable
 fun HomeRoute(
@@ -87,6 +92,8 @@ fun HomeContent(
     val sidePadding = dimensionResource(R.dimen.screen_horizontal_padding)
     val spacing = dimensionResource(R.dimen.home_section_spacing)
 
+    // The top of every background is lightened by the scrim below, so the icons are always dark.
+    StatusBarIcons(darkIcons = true)
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         // 45% of what the app can actually draw in: the status and navigation bars are not ours.
         val insets = WindowInsets.safeDrawing.asPaddingValues()
@@ -148,15 +155,13 @@ private fun LoadedContent(
     val sidePadding = dimensionResource(R.dimen.screen_horizontal_padding)
     state.weatherNow?.let { WeatherNowCard(it, Modifier.padding(horizontal = sidePadding)) }
 
-    AnimatedVisibility(visible = state.upcomingAdvice != null) {
-        // Hold on to the last advice so the card keeps its text while it animates out.
-        state.upcomingAdvice?.let { AdviceBanner(it, Modifier.padding(horizontal = sidePadding)) }
-    }
+    UpcomingAdvice(state, Modifier.padding(horizontal = sidePadding))
 
     state.currentOutfitLabel?.let { label ->
         HeroCharacter(
             outfits = state.currentOutfits,
             outfitLabel = label,
+            description = outfitDescription(label, state.gender),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(heroHeight),
@@ -173,6 +178,30 @@ private fun LoadedContent(
         selectedIndex = state.selectedSegmentIndex,
         focusIndex = state.shownSegmentIndex,
         onSegmentSelected = onSegmentSelected,
+    )
+}
+
+/**
+ * The warning about the next outfit change. Its space is kept even when there is nothing left to
+ * warn about (the last segment is shown), only faded out: removing it would pull the hero and the
+ * strip up from under the finger that just tapped a card.
+ */
+@Composable
+private fun UpcomingAdvice(state: HomeUiState, modifier: Modifier = Modifier) {
+    // A day with a single outfit has no changes at all, so there is nothing to reserve room for.
+    val advice = state.upcomingAdvice ?: state.advices.lastOrNull() ?: return
+    val visible = state.upcomingAdvice != null
+    val alpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(BANNER_FADE_MS),
+        label = "adviceAlpha",
+    )
+    AdviceBanner(
+        advice = advice,
+        modifier = modifier
+            .alpha(alpha)
+            // Faded out means gone for a screen reader too.
+            .then(if (visible) Modifier else Modifier.clearAndSetSemantics {}),
     )
 }
 

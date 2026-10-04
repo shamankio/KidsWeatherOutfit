@@ -50,7 +50,7 @@
     <dimen name="home_strip_border_selected">3dp</dimen>
 
     <!-- Home: stale bar and error state -->
-    <dimen name="home_stale_bar_min_height">32dp</dimen>
+    <dimen name="home_stale_bar_min_height">48dp</dimen>
     <dimen name="home_error_illustration">210dp</dimen>
     <dimen name="home_error_icon">150dp</dimen>
     <dimen name="home_error_halo_inner">16dp</dimen>

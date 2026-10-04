@@ -300,3 +300,7 @@ private fun SettingsGpsPreview() = PreviewSettings(
         notificationsEnabled = false,
     ),
 )
+
+@Preview(name = "Settings, font 2.0", widthDp = 360, heightDp = 1600, fontScale = 2f)
+@Composable
+private fun SettingsFont20Preview() = PreviewSettings(previewState)
