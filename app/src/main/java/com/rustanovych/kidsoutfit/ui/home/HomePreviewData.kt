@@ -5,6 +5,7 @@ import com.rustanovych.kidsoutfit.domain.engine.Direction
 import com.rustanovych.kidsoutfit.domain.model.ChildGender
 import com.rustanovych.kidsoutfit.domain.model.OutfitSet
 import com.rustanovych.kidsoutfit.ui.assets.outfitDrawables
+import com.rustanovych.kidsoutfit.ui.assets.outfitThumbDrawables
 
 /** Fake [HomeUiState]s for `@Preview`s. Not used at runtime. */
 internal object HomePreviewData {
@@ -13,7 +14,7 @@ internal object HomePreviewData {
     fun allSetsSegments(gender: ChildGender, currentIndex: Int? = null): List<SegmentUi> =
         OutfitSet.entries.mapIndexed { index, set ->
             SegmentUi(
-                drawables = outfitDrawables(set, gender),
+                drawables = outfitThumbDrawables(set, gender),
                 timeLabel = "%02d:00".format(7 + index),
                 outfit = set,
                 isCurrent = index == currentIndex,
@@ -26,7 +27,7 @@ internal object HomePreviewData {
     private fun segmentsOf(gender: ChildGender, currentIndex: Int) =
         dayPlan.mapIndexed { index, set ->
             SegmentUi(
-                drawables = outfitDrawables(set, gender),
+                drawables = outfitThumbDrawables(set, gender),
                 timeLabel = "%02d:00".format(dayHours[index]),
                 outfit = set,
                 isCurrent = index == currentIndex,

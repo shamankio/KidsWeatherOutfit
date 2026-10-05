@@ -26,10 +26,20 @@ tools/assets/.venv/bin/pip install "rembg[cpu]" pillow numpy scipy onnxruntime
 tools/assets/.venv/bin/python tools/assets/process_assets.py characters            # ~5 min for 24 files
 tools/assets/.venv/bin/python tools/assets/process_assets.py characters --thumbs   # + 512x512 upper-body thumbs
 tools/assets/.venv/bin/python tools/assets/process_assets.py backgrounds
+tools/assets/.venv/bin/python tools/assets/process_assets.py thumbs                # dedicated thumbs, see below
 ```
 
 It fails loudly if `mapping.csv` is missing one of the 24 set/gender combinations or a listed source file is absent,
 and prints a warning for any figure shorter than 1600 px after trimming (never upscaled: regenerate those).
+
+## Dedicated thumbnails (warm, cool)
+
+The strip and `OutfitThumbnail` crop the full figure to a square as wide as the figure. For the narrow warm and cool
+figures (516-674 px) that is little more than a face and a collar, so the two sets were hard to tell from each other.
+`process_assets.py thumbs` cuts `outfit_{warm,cool}_{boy,girl}_thumb.webp` (512x512, transparent) from the finished
+drawables with a 1050 px square (`WIDE_THUMBS`), which brings in the torso and, for cool, the tied jacket. Copy them into
+`drawable-nodpi/`; `outfitThumbDrawables()` in `OutfitAssets.kt` is the only place that picks them. To add another set,
+add it to `WIDE_THUMBS` and to the two `*ThumbDrawable` functions.
 
 ## Why the cut-out has extra steps
 

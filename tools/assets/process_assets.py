@@ -8,6 +8,7 @@ Run from the repo root with the venv in tools/assets/.venv:
 
     tools/assets/.venv/bin/python tools/assets/process_assets.py characters [--thumbs]
     tools/assets/.venv/bin/python tools/assets/process_assets.py backgrounds
+    tools/assets/.venv/bin/python tools/assets/process_assets.py thumbs
 """
 import argparse
 import csv
@@ -35,6 +36,10 @@ POCKET_MAX_CHROMA = 5
 POCKET_MIN_AREA_PX = 300  # ...and big enough not to be a highlight on the figure
 ERODE_PX = 7         # restored pixels stay this far from the figure edge (MinFilter size, odd)
 THUMB_SIZE = 512
+# Sets whose default thumb (a square as wide as the figure) shows little more than a head and a collar,
+# so similar sets are hard to tell apart. Value: side in px of the square cut from the top of the
+# 1600 px figure; wider than the default so the torso (and, for cool, the tied jacket) is in frame.
+WIDE_THUMBS = {(s, g): 1050 for s in ("warm", "cool") for g in GENDERS}
 BG_SIZE = (1080, 2400)
 
 
@@ -126,6 +131,24 @@ def thumb(img: Image.Image) -> Image.Image:
     return img.crop((left, 0, left + side, side)).resize((THUMB_SIZE, THUMB_SIZE), Image.LANCZOS)
 
 
+def wide_thumb(img: Image.Image, side: int) -> Image.Image:
+    """Square of [side] px from the top of the figure, centred on it, on transparency."""
+    canvas = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    canvas.alpha_composite(img.crop((0, 0, img.width, min(side, img.height))), ((side - img.width) // 2, 0))
+    return canvas.resize((THUMB_SIZE, THUMB_SIZE), Image.LANCZOS)
+
+
+def run_thumbs(args) -> None:
+    """Dedicated thumbs for WIDE_THUMBS, cut from the finished drawables (no re-cut-out needed)."""
+    out_dir = Path(args.out) / "thumbs"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for (set_name, gender), side in sorted(WIDE_THUMBS.items()):
+        name = f"outfit_{set_name}_{gender}_thumb.webp"
+        figure = Image.open(RES / f"outfit_{set_name}_{gender}.webp").convert("RGBA")
+        wide_thumb(figure, side).save(out_dir / name, "WEBP", quality=90, method=6)
+        print(f"done {name}", flush=True)
+
+
 def run_characters(args) -> None:
     expected = {(s, g) for s in SETS for g in GENDERS}
     rows = read_mapping(Path(args.mapping), expected, ("set", "gender"))
@@ -214,6 +237,9 @@ def main() -> None:
     b.add_argument("--bg-src", default=str(ROOT / "design/raw_backgrounds"))
     b.add_argument("--bg-mapping", default=str(ROOT / "tools/assets/bg_mapping.csv"))
     b.set_defaults(fn=run_backgrounds)
+
+    t = sub.add_parser("thumbs", help="dedicated thumbs for WIDE_THUMBS, cut from the finished drawables")
+    t.set_defaults(fn=run_thumbs)
 
     args = p.parse_args()
     args.fn(args)

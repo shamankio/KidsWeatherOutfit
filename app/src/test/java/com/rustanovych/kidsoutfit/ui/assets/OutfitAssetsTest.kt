@@ -56,4 +56,27 @@ class OutfitAssetsTest {
         val ids = OutfitSet.entries.flatMap { outfitDrawables(it, ChildGender.BOTH) }
         assertEquals(OutfitSet.entries.size * 2, ids.toSet().size)
     }
+
+    @Test
+    fun `warm and cool use a dedicated thumb for a single child, other sets the full figure`() {
+        for (set in OutfitSet.entries) {
+            for (gender in listOf(ChildGender.BOY, ChildGender.GIRL)) {
+                val full = outfitDrawables(set, gender)
+                val thumb = outfitThumbDrawables(set, gender)
+                assertEquals("$set/$gender count", 1, thumb.size)
+                if (set == OutfitSet.WARM || set == OutfitSet.COOL) {
+                    assertNotEquals("$set/$gender", full, thumb)
+                } else {
+                    assertEquals("$set/$gender", full, thumb)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `a pair keeps the full figures as its thumbnail`() {
+        for (set in OutfitSet.entries) {
+            assertEquals("$set", outfitDrawables(set, ChildGender.BOTH), outfitThumbDrawables(set, ChildGender.BOTH))
+        }
+    }
 }
