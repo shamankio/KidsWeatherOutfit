@@ -67,11 +67,19 @@ fun SettingsRoute(
         viewModel::onLocationPermissionResult,
     )
 
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+        viewModel::onNotificationPermissionResult,
+    )
+
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
                 SettingsEffect.RequestLocationPermission ->
                     permissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                // Only emitted on Android 13+, where the permission exists.
+                SettingsEffect.RequestNotificationPermission ->
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 // Onboarding sent the user here only to pick a city; once they have, they are done.
                 SettingsEffect.PlacePicked -> if (focusCitySearch) onBack()
             }
@@ -94,6 +102,7 @@ fun SettingsRoute(
         onQueryChanged = viewModel::onQueryChanged,
         onPlaceSelected = viewModel::onPlaceSelected,
         onNotificationsToggled = viewModel::onNotificationsToggled,
+        onTestNotification = viewModel::onTestNotification,
         onOpenLicenses = onOpenLicenses,
         modifier = modifier,
     )
@@ -115,6 +124,7 @@ fun SettingsContent(
     onNotificationsToggled: (Boolean) -> Unit,
     onOpenLicenses: () -> Unit,
     modifier: Modifier = Modifier,
+    onTestNotification: (() -> Unit)? = null,
 ) {
     val glass = LocalGlassColors.current
     var timePickerOpen by rememberSaveable { mutableStateOf(false) }
@@ -152,6 +162,8 @@ fun SettingsContent(
                 enabled = state.notificationsEnabled,
                 reminderTimeLabel = state.reminderTimeLabel,
                 onToggled = onNotificationsToggled,
+                // Debug builds only: the caller passes null in release.
+                onTestNotification = onTestNotification.takeIf { BuildConfig.DEBUG },
             )
             AboutSection {
                 SettingsRow(

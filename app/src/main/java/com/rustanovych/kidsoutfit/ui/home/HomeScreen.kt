@@ -3,6 +3,9 @@ package com.rustanovych.kidsoutfit.ui.home
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -22,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -43,6 +47,7 @@ import com.rustanovych.kidsoutfit.ui.home.components.HeroCharacter
 import com.rustanovych.kidsoutfit.ui.home.components.HomeErrorState
 import com.rustanovych.kidsoutfit.ui.home.components.HomeHeader
 import com.rustanovych.kidsoutfit.ui.home.components.HomeSkeleton
+import com.rustanovych.kidsoutfit.ui.home.components.NotificationPromptCard
 import com.rustanovych.kidsoutfit.ui.home.components.SegmentStrip
 import com.rustanovych.kidsoutfit.ui.home.components.StaleBar
 import com.rustanovych.kidsoutfit.ui.home.components.WeatherNowCard
@@ -61,12 +66,27 @@ fun HomeRoute(
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+        viewModel::onNotificationPermissionResult,
+    )
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                // Only emitted on Android 13+, where the permission exists.
+                HomeEffect.RequestNotificationPermission ->
+                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
     HomeContent(
         state = state,
         onDaySelected = viewModel::onDaySelected,
         onSegmentSelected = viewModel::onSegmentSelected,
         onRefresh = viewModel::onRefresh,
         onOpenSettings = onOpenSettings,
+        onNotificationPromptAccepted = viewModel::onNotificationPromptAccepted,
+        onNotificationPromptDeclined = viewModel::onNotificationPromptDeclined,
         modifier = modifier,
     )
 }
@@ -86,6 +106,8 @@ fun HomeContent(
     onRefresh: () -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
+    onNotificationPromptAccepted: () -> Unit = {},
+    onNotificationPromptDeclined: () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
 ) {
     val glass = LocalGlassColors.current
@@ -135,6 +157,8 @@ fun HomeContent(
                                 heroHeight = heroHeight,
                                 onDaySelected = onDaySelected,
                                 onSegmentSelected = onSegmentSelected,
+                                onNotificationPromptAccepted = onNotificationPromptAccepted,
+                                onNotificationPromptDeclined = onNotificationPromptDeclined,
                             )
                         }
                         Spacer(Modifier.height(dimensionResource(R.dimen.home_content_bottom_margin) - spacing))
@@ -151,9 +175,19 @@ private fun LoadedContent(
     heroHeight: Dp,
     onDaySelected: (Day) -> Unit,
     onSegmentSelected: (Int) -> Unit,
+    onNotificationPromptAccepted: () -> Unit,
+    onNotificationPromptDeclined: () -> Unit,
 ) {
     val sidePadding = dimensionResource(R.dimen.screen_horizontal_padding)
     state.weatherNow?.let { WeatherNowCard(it, Modifier.padding(horizontal = sidePadding)) }
+
+    if (state.showNotificationPrompt) {
+        NotificationPromptCard(
+            onAccept = onNotificationPromptAccepted,
+            onDecline = onNotificationPromptDeclined,
+            modifier = Modifier.padding(horizontal = sidePadding),
+        )
+    }
 
     UpcomingAdvice(state, Modifier.padding(horizontal = sidePadding))
 

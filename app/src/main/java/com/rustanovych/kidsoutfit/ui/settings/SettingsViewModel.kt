@@ -3,6 +3,7 @@ package com.rustanovych.kidsoutfit.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rustanovych.kidsoutfit.data.location.LocationPermission
+import com.rustanovych.kidsoutfit.domain.engine.ReminderSchedule
 import com.rustanovych.kidsoutfit.domain.model.ChildGender
 import com.rustanovych.kidsoutfit.domain.model.ChildProfile
 import com.rustanovych.kidsoutfit.domain.model.LocationMode
@@ -11,6 +12,8 @@ import com.rustanovych.kidsoutfit.domain.repository.PlaceNameResolver
 import com.rustanovych.kidsoutfit.domain.repository.PlaceSearch
 import com.rustanovych.kidsoutfit.domain.repository.SettingsRepository
 import com.rustanovych.kidsoutfit.domain.repository.WeatherRepository
+import com.rustanovych.kidsoutfit.notifications.DailyNotificationScheduler
+import com.rustanovych.kidsoutfit.notifications.NotificationPermission
 import com.rustanovych.kidsoutfit.ui.common.forecastPlaceName
 import com.rustanovych.kidsoutfit.ui.common.fullLabel
 import com.rustanovych.kidsoutfit.ui.common.regionLabel
@@ -31,11 +34,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 
 private const val SEARCH_DEBOUNCE_MS = 400L
 private const val MIN_QUERY_LENGTH = 2
-private const val REMINDER_LEAD_MINUTES = 30
-private const val MINUTES_PER_DAY = 24 * 60
 private const val STATE_SUBSCRIPTION_TIMEOUT_MS = 5_000L
 
 enum class LocationChoice { AUTO, MANUAL }
@@ -77,6 +79,9 @@ sealed interface SettingsEffect {
     /** GPS was chosen without the permission: the screen must show the system prompt. */
     data object RequestLocationPermission : SettingsEffect
 
+    /** The reminder was switched on without the permission: the screen must show the system prompt. */
+    data object RequestNotificationPermission : SettingsEffect
+
     /** A city was picked and stored. */
     data object PlacePicked : SettingsEffect
 }
@@ -97,6 +102,8 @@ class SettingsViewModel(
     private val locationPermission: LocationPermission,
     private val formatter: DisplayFormatter,
     private val applicationScope: CoroutineScope,
+    private val notificationPermission: NotificationPermission,
+    private val scheduler: DailyNotificationScheduler,
 ) : ViewModel() {
 
     private val query = MutableStateFlow("")
@@ -133,7 +140,7 @@ class SettingsViewModel(
     private data class Persisted(
         val profile: ChildProfile,
         val mode: LocationMode,
-        val notifications: Boolean,
+        val notifications: Boolean?,
         val autoName: String?,
     )
 
@@ -174,8 +181,20 @@ class SettingsViewModel(
     }
 
     fun onNotificationsToggled(enabled: Boolean) {
-        viewModelScope.launch { settingsRepository.setNotificationsEnabled(enabled) }
+        if (enabled && notificationPermission.needsRuntimeRequest && !notificationPermission.isGranted()) {
+            _effects.trySend(SettingsEffect.RequestNotificationPermission)
+        } else {
+            viewModelScope.launch { settingsRepository.setNotificationsEnabled(enabled) }
+        }
     }
+
+    /** The system prompt answered. Without the permission the switch stays off. */
+    fun onNotificationPermissionResult(granted: Boolean) {
+        viewModelScope.launch { settingsRepository.setNotificationsEnabled(granted) }
+    }
+
+    /** Debug menu: run the morning worker once, right now, to check what the notification says. */
+    fun onTestNotification() = scheduler.runNow()
 
     fun onAutoLocationSelected() {
         if (locationPermission.isGranted()) {
@@ -232,8 +251,7 @@ class SettingsViewModel(
     private fun buildState(persisted: Persisted, transient: Transient): SettingsUiState {
         val profile = persisted.profile
         val manual = persisted.mode as? LocationMode.Manual
-        val reminderMinutes =
-            (profile.departureHour * 60 + profile.departureMinute - REMINDER_LEAD_MINUTES + MINUTES_PER_DAY) % MINUTES_PER_DAY
+        val reminderTime = ReminderSchedule.triggerTime(LocalTime.of(profile.departureHour, profile.departureMinute))
         return SettingsUiState(
             gender = profile.gender,
             sensitivity = -profile.coldSensitivity.degreesCelsius,
@@ -255,8 +273,8 @@ class SettingsViewModel(
             } else {
                 transient.search
             },
-            notificationsEnabled = persisted.notifications,
-            reminderTimeLabel = formatter.time(reminderMinutes / 60, reminderMinutes % 60),
+            notificationsEnabled = persisted.notifications == true,
+            reminderTimeLabel = formatter.time(reminderTime.hour, reminderTime.minute),
         )
     }
 }

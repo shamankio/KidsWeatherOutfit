@@ -4,8 +4,17 @@ import com.rustanovych.kidsoutfit.data.location.GeocoderPlaceNameResolver
 import com.rustanovych.kidsoutfit.data.location.LocationPermission
 import com.rustanovych.kidsoutfit.data.location.LocationProvider
 import com.rustanovych.kidsoutfit.data.network.GeocodingDataSource
+import androidx.work.WorkManager
 import com.rustanovych.kidsoutfit.domain.repository.PlaceNameResolver
 import com.rustanovych.kidsoutfit.domain.repository.PlaceSearch
+import com.rustanovych.kidsoutfit.notifications.AndroidDailyOutfitNotifier
+import com.rustanovych.kidsoutfit.notifications.AndroidNotificationPermission
+import com.rustanovych.kidsoutfit.notifications.DailyNotificationScheduler
+import com.rustanovych.kidsoutfit.notifications.DailyOutfitNotifier
+import com.rustanovych.kidsoutfit.notifications.DailyOutfitRun
+import com.rustanovych.kidsoutfit.notifications.NotificationPermission
+import com.rustanovych.kidsoutfit.notifications.NotificationScheduleSync
+import com.rustanovych.kidsoutfit.notifications.WorkManagerDailyNotificationScheduler
 import com.rustanovych.kidsoutfit.ui.format.AndroidDisplayFormatter
 import com.rustanovych.kidsoutfit.ui.format.DisplayFormatter
 import com.rustanovych.kidsoutfit.ui.home.HomeViewModel
@@ -29,12 +38,30 @@ val appModule = module {
     single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     single<DisplayFormatter> { AndroidDisplayFormatter(androidContext()) }
 
+    single<NotificationPermission> { AndroidNotificationPermission(androidContext()) }
+    single<DailyNotificationScheduler> {
+        WorkManagerDailyNotificationScheduler(WorkManager.getInstance(androidContext()))
+    }
+    single<DailyOutfitNotifier> {
+        AndroidDailyOutfitNotifier(androidContext(), formatter = get(), permission = get())
+    }
+    single {
+        DailyOutfitRun(
+            settings = get(),
+            weather = get(),
+            notifier = get(),
+            scheduler = get(),
+        )
+    }
+    single { NotificationScheduleSync(settings = get(), scheduler = get(), scope = get()) }
+
     viewModel {
         HomeViewModel(
             weatherRepository = get(),
             settingsRepository = get(),
             placeNameResolver = get(),
             formatter = get(),
+            notificationPermission = get(),
         )
     }
 
@@ -55,6 +82,8 @@ val appModule = module {
             locationPermission = get(),
             formatter = get(),
             applicationScope = get(),
+            notificationPermission = get(),
+            scheduler = get(),
         )
     }
 }

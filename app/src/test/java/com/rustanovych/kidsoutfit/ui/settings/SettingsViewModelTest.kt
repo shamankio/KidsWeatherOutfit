@@ -8,8 +8,10 @@ import com.rustanovych.kidsoutfit.domain.model.LocationMode
 import com.rustanovych.kidsoutfit.domain.model.Place
 import com.rustanovych.kidsoutfit.fakes.FakeDisplayFormatter
 import com.rustanovych.kidsoutfit.fakes.FakeLocationPermission
+import com.rustanovych.kidsoutfit.fakes.FakeNotificationPermission
 import com.rustanovych.kidsoutfit.fakes.FakePlaceNameResolver
 import com.rustanovych.kidsoutfit.fakes.FakePlaceSearch
+import com.rustanovych.kidsoutfit.fakes.FakeScheduler
 import com.rustanovych.kidsoutfit.fakes.FakeSettingsRepository
 import com.rustanovych.kidsoutfit.fakes.FakeWeatherRepository
 import kotlinx.coroutines.CoroutineScope
@@ -55,6 +57,8 @@ class SettingsViewModelTest {
         val weather: FakeWeatherRepository,
         val search: FakePlaceSearch,
         val permission: FakeLocationPermission,
+        val notificationPermission: FakeNotificationPermission,
+        val scheduler: FakeScheduler,
         val viewModel: SettingsViewModel,
     )
 
@@ -62,11 +66,14 @@ class SettingsViewModelTest {
         profile: ChildProfile = ChildProfile.Default,
         mode: LocationMode = LocationMode.Auto,
         permissionGranted: Boolean = true,
+        notificationsGranted: Boolean = true,
     ): Fixture {
         val settings = FakeSettingsRepository(profile, mode)
         val weather = FakeWeatherRepository(ForecastState.Loading, settings)
         val search = FakePlaceSearch()
         val permission = FakeLocationPermission(permissionGranted)
+        val notificationPermission = FakeNotificationPermission(notificationsGranted)
+        val scheduler = FakeScheduler()
         val viewModel = SettingsViewModel(
             settingsRepository = settings,
             weatherRepository = weather,
@@ -75,11 +82,13 @@ class SettingsViewModelTest {
             locationPermission = permission,
             formatter = FakeDisplayFormatter,
             applicationScope = CoroutineScope(SupervisorJob() + dispatcher),
+            notificationPermission = notificationPermission,
+            scheduler = scheduler,
         )
         // The state only runs while collected, like it does on screen.
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
         runCurrent()
-        return Fixture(settings, weather, search, permission, viewModel)
+        return Fixture(settings, weather, search, permission, notificationPermission, scheduler, viewModel)
     }
 
     @Test
@@ -138,8 +147,53 @@ class SettingsViewModelTest {
         f.viewModel.onNotificationsToggled(true)
         advanceUntilIdle()
 
-        assertTrue(f.settings.notificationsState.value)
+        assertEquals(true, f.settings.notificationsState.value)
         assertTrue(f.viewModel.uiState.value.notificationsEnabled)
+    }
+
+    @Test
+    fun `switching the reminder on without the permission asks for it instead of storing`() = runTest(dispatcher) {
+        val f = fixture(notificationsGranted = false)
+
+        f.viewModel.effects.test {
+            f.viewModel.onNotificationsToggled(true)
+            advanceUntilIdle()
+            assertEquals(SettingsEffect.RequestNotificationPermission, awaitItem())
+        }
+        assertEquals(null, f.settings.notificationsState.value)
+
+        f.viewModel.onNotificationPermissionResult(granted = true)
+        advanceUntilIdle()
+        assertEquals(true, f.settings.notificationsState.value)
+    }
+
+    @Test
+    fun `a refused system dialog leaves the reminder off`() = runTest(dispatcher) {
+        val f = fixture(notificationsGranted = false)
+
+        f.viewModel.onNotificationPermissionResult(granted = false)
+        advanceUntilIdle()
+
+        assertEquals(false, f.settings.notificationsState.value)
+    }
+
+    @Test
+    fun `switching the reminder off never asks for the permission`() = runTest(dispatcher) {
+        val f = fixture(notificationsGranted = false)
+
+        f.viewModel.onNotificationsToggled(false)
+        advanceUntilIdle()
+
+        assertEquals(false, f.settings.notificationsState.value)
+    }
+
+    @Test
+    fun `the test notification runs the worker once`() = runTest(dispatcher) {
+        val f = fixture()
+
+        f.viewModel.onTestNotification()
+
+        assertEquals(listOf<FakeScheduler.Call>(FakeScheduler.Call.RunNow), f.scheduler.calls)
     }
 
     @Test

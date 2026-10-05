@@ -1,5 +1,6 @@
 package com.rustanovych.kidsoutfit.fakes
 
+import com.rustanovych.kidsoutfit.domain.engine.Briefing
 import com.rustanovych.kidsoutfit.domain.model.ChildGender
 import com.rustanovych.kidsoutfit.domain.model.ChildProfile
 import com.rustanovych.kidsoutfit.domain.model.ColdSensitivity
@@ -12,6 +13,9 @@ import com.rustanovych.kidsoutfit.domain.repository.PlaceNameResolver
 import com.rustanovych.kidsoutfit.domain.repository.PlaceSearch
 import com.rustanovych.kidsoutfit.domain.repository.SettingsRepository
 import com.rustanovych.kidsoutfit.domain.repository.WeatherRepository
+import com.rustanovych.kidsoutfit.notifications.DailyNotificationScheduler
+import com.rustanovych.kidsoutfit.notifications.DailyOutfitNotifier
+import com.rustanovych.kidsoutfit.notifications.NotificationPermission
 import com.rustanovych.kidsoutfit.ui.format.DisplayFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,11 +53,11 @@ class FakeSettingsRepository(
 ) : SettingsRepository {
     val profileState = MutableStateFlow(profile)
     val locationModeState = MutableStateFlow(locationMode)
-    val notificationsState = MutableStateFlow(false)
+    val notificationsState = MutableStateFlow<Boolean?>(null)
 
     override val profile: Flow<ChildProfile> = profileState
     override val locationMode: Flow<LocationMode> = locationModeState
-    override val notificationsEnabled: Flow<Boolean> = notificationsState
+    override val notificationsEnabled: Flow<Boolean?> = notificationsState
 
     override suspend fun setGender(gender: ChildGender) {
         profileState.update { it.copy(gender = gender) }
@@ -115,4 +119,47 @@ fun snapshots(hours: IntRange, apparent: Double, weatherCode: Int = 0): List<Wea
 
 class FakeLocationPermission(var granted: Boolean = false) : com.rustanovych.kidsoutfit.data.location.LocationPermission {
     override fun isGranted(): Boolean = granted
+}
+
+class FakeNotificationPermission(
+    var granted: Boolean = false,
+    override val needsRuntimeRequest: Boolean = true,
+) : NotificationPermission {
+    override fun isGranted(): Boolean = granted
+}
+
+class FakeNotifier : DailyOutfitNotifier {
+    val shown = mutableListOf<Pair<Briefing, ChildGender>>()
+
+    override fun show(briefing: Briefing, gender: ChildGender) {
+        shown += briefing to gender
+    }
+}
+
+/** Records every call so tests can assert which enqueue flavour was used. */
+class FakeScheduler : DailyNotificationScheduler {
+    sealed interface Call {
+        data class Schedule(val hour: Int, val minute: Int, val enabled: Boolean) : Call
+        data class Ensure(val hour: Int, val minute: Int, val enabled: Boolean) : Call
+        data class Next(val hour: Int, val minute: Int) : Call
+        data object RunNow : Call
+    }
+
+    val calls = mutableListOf<Call>()
+
+    override fun schedule(departureHour: Int, departureMinute: Int, enabled: Boolean) {
+        calls += Call.Schedule(departureHour, departureMinute, enabled)
+    }
+
+    override fun ensureScheduled(departureHour: Int, departureMinute: Int, enabled: Boolean) {
+        calls += Call.Ensure(departureHour, departureMinute, enabled)
+    }
+
+    override fun scheduleNext(departureHour: Int, departureMinute: Int) {
+        calls += Call.Next(departureHour, departureMinute)
+    }
+
+    override fun runNow() {
+        calls += Call.RunNow
+    }
 }

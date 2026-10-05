@@ -13,6 +13,7 @@ import com.rustanovych.kidsoutfit.domain.model.OutfitSet
 import com.rustanovych.kidsoutfit.domain.model.Place
 import com.rustanovych.kidsoutfit.domain.model.WeatherSnapshot
 import com.rustanovych.kidsoutfit.fakes.FakeDisplayFormatter
+import com.rustanovych.kidsoutfit.fakes.FakeNotificationPermission
 import com.rustanovych.kidsoutfit.fakes.FakePlaceNameResolver
 import com.rustanovych.kidsoutfit.fakes.FakeSettingsRepository
 import com.rustanovych.kidsoutfit.fakes.FakeWeatherRepository
@@ -68,7 +69,8 @@ class HomeViewModelTest {
         settings: FakeSettingsRepository = FakeSettingsRepository(profile()),
         resolver: FakePlaceNameResolver = FakePlaceNameResolver(),
         now: LocalTime = LocalTime.of(10, 0),
-    ) = HomeViewModel(weather, settings, resolver, FakeDisplayFormatter, now = { now })
+        notificationPermission: FakeNotificationPermission = FakeNotificationPermission(),
+    ) = HomeViewModel(weather, settings, resolver, FakeDisplayFormatter, notificationPermission, now = { now })
 
     @Test
     fun `loading forecast yields a loading state`() = runTest {
@@ -312,5 +314,86 @@ class HomeViewModelTest {
         viewModel(weather = weather, resolver = FakePlaceNameResolver(null)).uiState.test {
             assertNull(expectMostRecentItem().locationName)
         }
+    }
+
+    @Test
+    fun `the reminder is offered over a loaded forecast when the user was never asked`() = runTest {
+        val vm = viewModel()
+
+        vm.uiState.test {
+            assertTrue(expectMostRecentItem().showNotificationPrompt)
+        }
+    }
+
+    @Test
+    fun `the reminder is not offered while loading, on error, or once answered`() = runTest {
+        val loading = viewModel(weather = FakeWeatherRepository(ForecastState.Loading))
+        loading.uiState.test { assertFalse(expectMostRecentItem().showNotificationPrompt) }
+
+        val failed = viewModel(weather = FakeWeatherRepository(ForecastState.Error(cached = null)))
+        failed.uiState.test { assertFalse(expectMostRecentItem().showNotificationPrompt) }
+
+        val settings = FakeSettingsRepository(profile())
+        settings.notificationsState.value = false
+        viewModel(settings = settings).uiState.test { assertFalse(expectMostRecentItem().showNotificationPrompt) }
+    }
+
+    @Test
+    fun `declining is persisted and hides the card`() = runTest {
+        val settings = FakeSettingsRepository(profile())
+        val vm = viewModel(settings = settings)
+
+        vm.uiState.test {
+            assertTrue(expectMostRecentItem().showNotificationPrompt)
+            vm.onNotificationPromptDeclined()
+            assertFalse(expectMostRecentItem().showNotificationPrompt)
+        }
+        assertEquals(false, settings.notificationsState.value)
+    }
+
+    @Test
+    fun `accepting with the permission already granted enables the reminder`() = runTest {
+        val settings = FakeSettingsRepository(profile())
+        val vm = viewModel(settings = settings, notificationPermission = FakeNotificationPermission(granted = true))
+
+        vm.onNotificationPromptAccepted()
+
+        assertEquals(true, settings.notificationsState.value)
+    }
+
+    @Test
+    fun `accepting without the permission asks the screen for the system dialog`() = runTest {
+        val settings = FakeSettingsRepository(profile())
+        val vm = viewModel(settings = settings)
+
+        vm.effects.test {
+            vm.onNotificationPromptAccepted()
+            assertEquals(HomeEffect.RequestNotificationPermission, awaitItem())
+        }
+        // Nothing is stored until the dialog answers.
+        assertNull(settings.notificationsState.value)
+    }
+
+    @Test
+    fun `before Android 13 accepting needs no dialog`() = runTest {
+        val settings = FakeSettingsRepository(profile())
+        val vm = viewModel(
+            settings = settings,
+            notificationPermission = FakeNotificationPermission(granted = false, needsRuntimeRequest = false),
+        )
+
+        vm.onNotificationPromptAccepted()
+
+        assertEquals(true, settings.notificationsState.value)
+    }
+
+    @Test
+    fun `a refused system dialog is remembered as a no`() = runTest {
+        val settings = FakeSettingsRepository(profile())
+        val vm = viewModel(settings = settings)
+
+        vm.onNotificationPermissionResult(granted = false)
+
+        assertEquals(false, settings.notificationsState.value)
     }
 }

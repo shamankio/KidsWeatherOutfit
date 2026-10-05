@@ -66,8 +66,8 @@ class SettingsRepositoryImpl(
         .map { it.toLocationMode() }
         .distinctUntilChanged()
 
-    override val notificationsEnabled: Flow<Boolean> = preferences
-        .map { it[Keys.NotificationsEnabled] ?: false }
+    override val notificationsEnabled: Flow<Boolean?> = preferences
+        .map { it[Keys.NotificationsEnabled] }
         .distinctUntilChanged()
 
     override suspend fun setGender(gender: ChildGender) {

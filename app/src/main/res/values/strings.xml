@@ -24,6 +24,17 @@
     <string name="home_error_body">Check your internet connection. Your outfit tips will be back in a moment.</string>
     <string name="home_error_retry">Try again</string>
 
+    <!-- Morning reminder notification -->
+    <string name="notification_channel_name">Daily outfit</string>
+    <string name="notification_channel_description">A morning reminder of how to dress your child, with a heads-up about changes in the weather</string>
+    <string name="notification_daily_title">Today: %1$s</string>
+    <string name="notification_daily_stable">Stable weather all day</string>
+
+    <!-- Home: contextual notification prompt -->
+    <string name="home_notif_prompt_title">Remind you every morning how to dress your child?</string>
+    <string name="home_notif_prompt_yes">Yes</string>
+    <string name="home_notif_prompt_no">No, thanks</string>
+
     <!-- Warning banner: %1$s = time, %2$s = outfit set name -->
     <string name="advice_warmer">At %1$s it gets warmer — %2$s</string>
     <string name="advice_colder">At %1$s it gets colder — %2$s</string>
@@ -85,6 +96,7 @@
     <string name="settings_section_notifications">Notifications</string>
     <string name="settings_reminder_title">Morning outfit reminder</string>
     <string name="settings_reminder_caption">30 minutes before departure</string>
+    <string name="settings_debug_test_notification">Test notification now (debug)</string>
     <string name="settings_reminder_caption_at">30 minutes before departure · %1$s</string>
     <string name="settings_section_about">About</string>
     <string name="settings_app_version">App version</string>

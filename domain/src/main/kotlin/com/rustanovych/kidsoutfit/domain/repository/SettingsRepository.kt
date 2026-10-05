@@ -21,8 +21,12 @@ interface SettingsRepository {
     /** Where the forecast location comes from, defaulting to [LocationMode.Auto]. */
     val locationMode: Flow<LocationMode>
 
-    /** Whether the morning outfit reminder is switched on, defaulting to `false`. */
-    val notificationsEnabled: Flow<Boolean>
+    /**
+     * Whether the morning outfit reminder is switched on. `null` means the user was never asked, so
+     * Home may still offer it; `false` is an explicit refusal (or switched off) and is never
+     * offered again.
+     */
+    val notificationsEnabled: Flow<Boolean?>
 
     suspend fun setGender(gender: ChildGender)
 

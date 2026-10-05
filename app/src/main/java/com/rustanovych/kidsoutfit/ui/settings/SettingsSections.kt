@@ -534,6 +534,7 @@ fun NotificationsSection(
     enabled: Boolean,
     reminderTimeLabel: String,
     onToggled: (Boolean) -> Unit,
+    onTestNotification: (() -> Unit)? = null,
 ) {
     val glass = LocalGlassColors.current
     SectionHeader(stringResource(R.string.settings_section_notifications))
@@ -574,6 +575,14 @@ fun NotificationsSection(
                 } else {
                     null
                 },
+            )
+        }
+        if (onTestNotification != null) {
+            RowDivider()
+            SettingsRow(
+                title = stringResource(R.string.settings_debug_test_notification),
+                iconRes = R.drawable.ic_ms_notifications_active,
+                onClick = onTestNotification,
             )
         }
     }

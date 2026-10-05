@@ -12,16 +12,21 @@ import com.rustanovych.kidsoutfit.domain.model.WeatherSnapshot
 import com.rustanovych.kidsoutfit.domain.repository.PlaceNameResolver
 import com.rustanovych.kidsoutfit.domain.repository.SettingsRepository
 import com.rustanovych.kidsoutfit.domain.repository.WeatherRepository
+import com.rustanovych.kidsoutfit.notifications.NotificationPermission
 import com.rustanovych.kidsoutfit.ui.assets.backgroundFor
 import com.rustanovych.kidsoutfit.ui.assets.outfitDrawables
+import com.rustanovych.kidsoutfit.ui.assets.outfitThumbDrawables
 import com.rustanovych.kidsoutfit.ui.assets.weatherConditionRes
 import com.rustanovych.kidsoutfit.ui.assets.weatherIcon
 import com.rustanovych.kidsoutfit.ui.common.forecastPlaceName
 import com.rustanovych.kidsoutfit.ui.format.DisplayFormatter
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,6 +47,7 @@ class HomeViewModel(
     private val settingsRepository: SettingsRepository,
     private val placeNameResolver: PlaceNameResolver,
     private val formatter: DisplayFormatter,
+    private val notificationPermission: NotificationPermission,
     private val now: () -> LocalTime = { LocalTime.now() },
 ) : ViewModel() {
 
@@ -54,14 +60,20 @@ class HomeViewModel(
     private val selection = MutableStateFlow(Selection())
     private val isRefreshing = MutableStateFlow(false)
 
+    private val _effects = Channel<HomeEffect>(Channel.BUFFERED)
+    val effects: Flow<HomeEffect> = _effects.receiveAsFlow()
+
+    /** Refresh progress and the reminder answer, folded into one input to stay within `combine`'s typed arity. */
+    private data class Transient(val refreshing: Boolean, val notificationsEnabled: Boolean?)
+
     val uiState: StateFlow<HomeUiState> = combine(
         weatherRepository.forecast(),
         settingsRepository.profile,
         forecastPlaceName(settingsRepository, weatherRepository, placeNameResolver),
         selection,
-        isRefreshing,
-    ) { forecast, profile, locationName, selection, refreshing ->
-        buildState(forecast, profile, locationName, selection, refreshing)
+        combine(isRefreshing, settingsRepository.notificationsEnabled, ::Transient),
+    ) { forecast, profile, locationName, selection, transient ->
+        buildState(forecast, profile, locationName, selection, transient)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(STATE_SUBSCRIPTION_TIMEOUT_MS),
@@ -94,23 +106,45 @@ class HomeViewModel(
         }
     }
 
+    fun onNotificationPromptAccepted() {
+        // Before Android 13 there is no runtime permission, so accepting is enough.
+        if (notificationPermission.isGranted() || !notificationPermission.needsRuntimeRequest) {
+            setNotificationsEnabled(true)
+        } else {
+            _effects.trySend(HomeEffect.RequestNotificationPermission)
+        }
+    }
+
+    /** The system dialog answered. A refusal is remembered like "No, thanks": never ask again. */
+    fun onNotificationPermissionResult(granted: Boolean) = setNotificationsEnabled(granted)
+
+    fun onNotificationPromptDeclined() = setNotificationsEnabled(false)
+
+    private fun setNotificationsEnabled(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setNotificationsEnabled(enabled) }
+    }
+
     private fun buildState(
         forecast: ForecastState,
         profile: ChildProfile,
         locationName: String?,
         selection: Selection,
-        refreshing: Boolean,
+        transient: Transient,
     ): HomeUiState {
         val base = HomeUiState(
             isLoading = false,
-            isRefreshing = refreshing,
+            isRefreshing = transient.refreshing,
             selectedDay = selection.day,
             gender = profile.gender,
             locationName = locationName,
         )
         return when (forecast) {
             ForecastState.Loading -> base.copy(isLoading = true)
-            is ForecastState.Ready -> withForecast(base, forecast.bundle, profile, selection)
+            is ForecastState.Ready -> withForecast(base, forecast.bundle, profile, selection).let {
+                // Offered only over a forecast that loaded: asking before the app has shown anything
+                // useful is asking too early.
+                if (it.error) it else it.copy(showNotificationPrompt = transient.notificationsEnabled == null)
+            }
             is ForecastState.Error -> {
                 val cached = forecast.cached ?: return base.copy(error = true)
                 withForecast(base, cached, profile, selection).let {
@@ -142,7 +176,7 @@ class HomeViewModel(
             selectedSegmentIndex = selection.segmentIndex?.takeIf { it in plan.segments.indices },
             segments = plan.segments.mapIndexed { index, segment ->
                 SegmentUi(
-                    drawables = outfitDrawables(segment.outfit, profile.gender),
+                    drawables = outfitThumbDrawables(segment.outfit, profile.gender),
                     timeLabel = formatter.time(segment.startHour),
                     outfit = segment.outfit,
                     isCurrent = index == currentIndex,

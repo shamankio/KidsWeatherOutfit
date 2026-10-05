@@ -9,6 +9,12 @@ import com.rustanovych.kidsoutfit.domain.model.OutfitSet
 
 enum class Day { TODAY, TOMORROW }
 
+/** One-off requests to the screen, which owns the system dialogs. */
+sealed interface HomeEffect {
+    /** The user accepted the reminder but the system permission is still missing. */
+    data object RequestNotificationPermission : HomeEffect
+}
+
 /**
  * Everything the home screen draws. Display strings are final (formatted by the ViewModel); the
  * only text left to the screen is the localized wording around them, which lives in `strings.xml`.
@@ -22,6 +28,8 @@ enum class Day { TODAY, TOMORROW }
  * @property locationName `null` when the name is unknown (GPS mode before reverse geocoding
  * answers, or it failed); the screen shows a generic label.
  * @property updatedAtLabel When the shown forecast was fetched, for the stale bar.
+ * @property showNotificationPrompt Offer the morning reminder: a forecast is on screen and the user
+ * was never asked.
  */
 data class HomeUiState(
     val isLoading: Boolean = true,
@@ -39,6 +47,7 @@ data class HomeUiState(
     val isStale: Boolean = false,
     val updatedAtLabel: String? = null,
     val error: Boolean = false,
+    val showNotificationPrompt: Boolean = false,
 ) {
     /** The segment the hero shows: the tapped one, else the one active at departure. */
     val shownSegmentIndex: Int?
