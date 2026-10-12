@@ -28,6 +28,8 @@ playServicesLocation = "21.4.0"
 coreSplashscreen = "1.2.0"
 # 1.2.1 is built with Kotlin 2.1 metadata, readable by AGP's built-in Kotlin 2.2 compiler.
 turbine = "1.2.1"
+playServicesAds = "25.5.0"
+ump = "4.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -68,6 +70,8 @@ androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx"
 androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "workManager" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
+user-messaging-platform = { group = "com.google.android.ump", name = "user-messaging-platform", version.ref = "ump" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]

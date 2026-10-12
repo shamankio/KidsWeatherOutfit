@@ -12,6 +12,7 @@ import com.rustanovych.kidsoutfit.domain.model.LocationMode
 import com.rustanovych.kidsoutfit.domain.model.OutfitSet
 import com.rustanovych.kidsoutfit.domain.model.Place
 import com.rustanovych.kidsoutfit.domain.model.WeatherSnapshot
+import com.rustanovych.kidsoutfit.fakes.FakeAdConsent
 import com.rustanovych.kidsoutfit.fakes.FakeDisplayFormatter
 import com.rustanovych.kidsoutfit.fakes.FakeNotificationPermission
 import com.rustanovych.kidsoutfit.fakes.FakePlaceNameResolver
@@ -70,7 +71,8 @@ class HomeViewModelTest {
         resolver: FakePlaceNameResolver = FakePlaceNameResolver(),
         now: LocalTime = LocalTime.of(10, 0),
         notificationPermission: FakeNotificationPermission = FakeNotificationPermission(),
-    ) = HomeViewModel(weather, settings, resolver, FakeDisplayFormatter, notificationPermission, now = { now })
+        adConsent: FakeAdConsent = FakeAdConsent(),
+    ) = HomeViewModel(weather, settings, resolver, FakeDisplayFormatter, notificationPermission, adConsent, now = { now })
 
     @Test
     fun `loading forecast yields a loading state`() = runTest {
@@ -395,5 +397,17 @@ class HomeViewModelTest {
         vm.onNotificationPermissionResult(granted = false)
 
         assertEquals(false, settings.notificationsState.value)
+    }
+
+    @Test
+    fun `the banner is shown only once consent allows ads`() = runTest {
+        val consent = FakeAdConsent(canRequestAds = false)
+        val vm = viewModel(adConsent = consent)
+
+        vm.showAds.test {
+            assertEquals(false, awaitItem())
+            consent.canRequestAds.value = true
+            assertEquals(true, awaitItem())
+        }
     }
 }

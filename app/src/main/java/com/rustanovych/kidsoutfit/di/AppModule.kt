@@ -5,6 +5,8 @@ import com.rustanovych.kidsoutfit.data.location.LocationPermission
 import com.rustanovych.kidsoutfit.data.location.LocationProvider
 import com.rustanovych.kidsoutfit.data.network.GeocodingDataSource
 import androidx.work.WorkManager
+import com.rustanovych.kidsoutfit.ads.AdConsent
+import com.rustanovych.kidsoutfit.ads.UmpConsentManager
 import com.rustanovych.kidsoutfit.domain.repository.PlaceNameResolver
 import com.rustanovych.kidsoutfit.domain.repository.PlaceSearch
 import com.rustanovych.kidsoutfit.notifications.AndroidDailyOutfitNotifier
@@ -36,6 +38,7 @@ val appModule = module {
     single<PlaceSearch> { get<GeocodingDataSource>() }
     // Work that must finish even if the screen that started it is gone.
     single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+    single<AdConsent> { UmpConsentManager(androidContext(), scope = get()) }
     single<DisplayFormatter> { AndroidDisplayFormatter(androidContext()) }
 
     single<NotificationPermission> { AndroidNotificationPermission(androidContext()) }
@@ -62,6 +65,7 @@ val appModule = module {
             placeNameResolver = get(),
             formatter = get(),
             notificationPermission = get(),
+            adConsent = get(),
         )
     }
 
@@ -84,6 +88,7 @@ val appModule = module {
             applicationScope = get(),
             notificationPermission = get(),
             scheduler = get(),
+            adConsent = get(),
         )
     }
 }

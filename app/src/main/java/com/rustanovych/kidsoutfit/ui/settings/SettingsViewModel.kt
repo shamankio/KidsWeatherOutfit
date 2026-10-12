@@ -3,6 +3,7 @@ package com.rustanovych.kidsoutfit.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rustanovych.kidsoutfit.data.location.LocationPermission
+import com.rustanovych.kidsoutfit.ads.AdConsent
 import com.rustanovych.kidsoutfit.domain.engine.ReminderSchedule
 import com.rustanovych.kidsoutfit.domain.model.ChildGender
 import com.rustanovych.kidsoutfit.domain.model.ChildProfile
@@ -104,7 +105,11 @@ class SettingsViewModel(
     private val applicationScope: CoroutineScope,
     private val notificationPermission: NotificationPermission,
     private val scheduler: DailyNotificationScheduler,
+    adConsent: AdConsent,
 ) : ViewModel() {
+
+    /** The "Privacy settings" row is offered only where the consent form must be reopenable. */
+    val showPrivacySettings: StateFlow<Boolean> = adConsent.privacyOptionsRequired
 
     private val query = MutableStateFlow("")
 

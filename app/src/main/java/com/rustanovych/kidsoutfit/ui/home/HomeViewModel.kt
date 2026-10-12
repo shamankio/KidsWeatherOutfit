@@ -2,6 +2,7 @@ package com.rustanovych.kidsoutfit.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rustanovych.kidsoutfit.ads.AdConsent
 import com.rustanovych.kidsoutfit.domain.engine.ChangeAdvisor
 import com.rustanovych.kidsoutfit.domain.engine.DaySegmenter
 import com.rustanovych.kidsoutfit.domain.model.ChildProfile
@@ -48,6 +49,7 @@ class HomeViewModel(
     private val placeNameResolver: PlaceNameResolver,
     private val formatter: DisplayFormatter,
     private val notificationPermission: NotificationPermission,
+    adConsent: AdConsent,
     private val now: () -> LocalTime = { LocalTime.now() },
 ) : ViewModel() {
 
@@ -62,6 +64,9 @@ class HomeViewModel(
 
     private val _effects = Channel<HomeEffect>(Channel.BUFFERED)
     val effects: Flow<HomeEffect> = _effects.receiveAsFlow()
+
+    /** Whether the ad banner may be shown: only after consent allows requesting ads. */
+    val showAds: StateFlow<Boolean> = adConsent.canRequestAds
 
     /** Refresh progress and the reminder answer, folded into one input to stay within `combine`'s typed arity. */
     private data class Transient(val refreshing: Boolean, val notificationsEnabled: Boolean?)

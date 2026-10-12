@@ -6,6 +6,7 @@ import com.rustanovych.kidsoutfit.domain.model.ChildProfile
 import com.rustanovych.kidsoutfit.domain.model.ForecastState
 import com.rustanovych.kidsoutfit.domain.model.LocationMode
 import com.rustanovych.kidsoutfit.domain.model.Place
+import com.rustanovych.kidsoutfit.fakes.FakeAdConsent
 import com.rustanovych.kidsoutfit.fakes.FakeDisplayFormatter
 import com.rustanovych.kidsoutfit.fakes.FakeLocationPermission
 import com.rustanovych.kidsoutfit.fakes.FakeNotificationPermission
@@ -59,6 +60,7 @@ class SettingsViewModelTest {
         val permission: FakeLocationPermission,
         val notificationPermission: FakeNotificationPermission,
         val scheduler: FakeScheduler,
+        val adConsent: FakeAdConsent,
         val viewModel: SettingsViewModel,
     )
 
@@ -74,6 +76,7 @@ class SettingsViewModelTest {
         val permission = FakeLocationPermission(permissionGranted)
         val notificationPermission = FakeNotificationPermission(notificationsGranted)
         val scheduler = FakeScheduler()
+        val adConsent = FakeAdConsent()
         val viewModel = SettingsViewModel(
             settingsRepository = settings,
             weatherRepository = weather,
@@ -84,11 +87,12 @@ class SettingsViewModelTest {
             applicationScope = CoroutineScope(SupervisorJob() + dispatcher),
             notificationPermission = notificationPermission,
             scheduler = scheduler,
+            adConsent = adConsent,
         )
         // The state only runs while collected, like it does on screen.
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
         runCurrent()
-        return Fixture(settings, weather, search, permission, notificationPermission, scheduler, viewModel)
+        return Fixture(settings, weather, search, permission, notificationPermission, scheduler, adConsent, viewModel)
     }
 
     @Test
@@ -339,5 +343,15 @@ class SettingsViewModelTest {
         advanceUntilIdle()
 
         assertEquals("Poznań", f.viewModel.uiState.value.autoPlaceName)
+    }
+
+    @Test
+    fun `the privacy settings row follows the consent requirement`() = runTest {
+        val f = fixture()
+        assertEquals(false, f.viewModel.showPrivacySettings.value)
+
+        f.adConsent.privacyOptionsRequired.value = true
+
+        assertEquals(true, f.viewModel.showPrivacySettings.value)
     }
 }

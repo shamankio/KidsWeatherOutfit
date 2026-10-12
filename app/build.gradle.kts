@@ -1,7 +1,31 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+}
+
+// Real AdMob ids live only in local.properties (gitignored); they are never printed or committed.
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.isFile }?.inputStream()?.use { load(it) }
+}
+val admobAppId: String = localProperties.getProperty("ADMOB_APP_ID").orEmpty()
+val admobBannerId: String = localProperties.getProperty("ADMOB_BANNER_ID").orEmpty()
+// Optional: hashed id of a physical test phone, printed by the UMP SDK in logcat (see docs/ads-testing.md).
+val umpTestDeviceId: String = localProperties.getProperty("UMP_TEST_DEVICE_ID").orEmpty()
+// Optional: ads test-device id of a physical phone (printed by the ads SDK in logcat). Makes that phone
+// get test ads on real ad units in any build type, so a real ad is never shown or clicked on it.
+val adsTestDeviceId: String = localProperties.getProperty("ADS_TEST_DEVICE_ID").orEmpty()
+
+gradle.taskGraph.whenReady {
+    val buildsRelease = allTasks.any { it.project == project && it.name.contains("Release") }
+    if (buildsRelease && (admobAppId.isBlank() || admobBannerId.isBlank())) {
+        throw GradleException(
+            "Release builds need ADMOB_APP_ID and ADMOB_BANNER_ID in local.properties " +
+                "(see the AdMob section of CLAUDE.md).",
+        )
+    }
 }
 
 android {
@@ -23,9 +47,20 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Google's public sample ids: a debug build can never serve (or click) a real ad.
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
+            buildConfigField("String", "UMP_TEST_DEVICE_ID", "\"$umpTestDeviceId\"")
+            buildConfigField("String", "ADS_TEST_DEVICE_ID", "\"$adsTestDeviceId\"")
+        }
         release {
+            manifestPlaceholders["admobAppId"] = admobAppId
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerId\"")
+            buildConfigField("String", "UMP_TEST_DEVICE_ID", "\"\"")
+            buildConfigField("String", "ADS_TEST_DEVICE_ID", "\"$adsTestDeviceId\"")
             optimization {
-                enable = false
+                enable = true
             }
         }
     }
@@ -83,6 +118,10 @@ dependencies {
     // Background work & location
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.play.services.location)
+
+    // Ads & consent
+    implementation(libs.play.services.ads)
+    implementation(libs.user.messaging.platform)
     // Bridges Play services Task<T> to suspend functions (Task.await).
     implementation(libs.kotlinx.coroutines.play.services)
 

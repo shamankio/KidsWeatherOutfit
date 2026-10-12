@@ -99,8 +99,7 @@ private fun RowDivider() {
 
 /**
  * A tappable row with a leading icon tile, a title, an optional value and a trailing chevron. The
- * About section is a list of these, so a further row (stage 7's "Privacy settings") is one more
- * call.
+ * About section is a list of these, so a further row is one more call.
  */
 @Composable
 fun SettingsRow(

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rustanovych.kidsoutfit.R
+import com.rustanovych.kidsoutfit.ads.AdBanner
 import com.rustanovych.kidsoutfit.ui.assets.outfitDescription
 import com.rustanovych.kidsoutfit.ui.components.StatusBarIcons
 import com.rustanovych.kidsoutfit.ui.home.components.AdviceBanner
@@ -66,6 +67,7 @@ fun HomeRoute(
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val showAds by viewModel.showAds.collectAsStateWithLifecycle()
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
         viewModel::onNotificationPermissionResult,
@@ -88,13 +90,14 @@ fun HomeRoute(
         onNotificationPromptAccepted = viewModel::onNotificationPromptAccepted,
         onNotificationPromptDeclined = viewModel::onNotificationPromptDeclined,
         modifier = modifier,
+        bottomBar = { if (showAds) AdBanner() },
     )
 }
 
 /**
  * Stateless home screen: a weather illustration as the backdrop, glass cards on top.
  *
- * @param bottomBar Slot for the stage 7 ad banner. It becomes the Scaffold's bottom bar, so the
+ * @param bottomBar Slot for the ad banner. It becomes the Scaffold's bottom bar, so the
  * scrolling content always ends above it and nothing is covered.
  */
 @OptIn(ExperimentalMaterial3Api::class)

@@ -13,6 +13,8 @@ import com.rustanovych.kidsoutfit.domain.repository.PlaceNameResolver
 import com.rustanovych.kidsoutfit.domain.repository.PlaceSearch
 import com.rustanovych.kidsoutfit.domain.repository.SettingsRepository
 import com.rustanovych.kidsoutfit.domain.repository.WeatherRepository
+import android.app.Activity
+import com.rustanovych.kidsoutfit.ads.AdConsent
 import com.rustanovych.kidsoutfit.notifications.DailyNotificationScheduler
 import com.rustanovych.kidsoutfit.notifications.DailyOutfitNotifier
 import com.rustanovych.kidsoutfit.notifications.NotificationPermission
@@ -162,4 +164,13 @@ class FakeScheduler : DailyNotificationScheduler {
     override fun runNow() {
         calls += Call.RunNow
     }
+}
+
+class FakeAdConsent(canRequestAds: Boolean = false, privacyOptionsRequired: Boolean = false) : AdConsent {
+    override val canRequestAds = MutableStateFlow(canRequestAds)
+    override val privacyOptionsRequired = MutableStateFlow(privacyOptionsRequired)
+
+    override fun gatherConsent(activity: Activity, onDone: (Boolean) -> Unit) = onDone(canRequestAds.value)
+
+    override fun showPrivacyOptionsForm(activity: Activity) = Unit
 }

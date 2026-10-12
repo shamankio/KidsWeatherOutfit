@@ -2,6 +2,7 @@ package com.rustanovych.kidsoutfit.ui.settings
 
 import android.Manifest
 import android.text.format.DateFormat
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -47,11 +48,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rustanovych.kidsoutfit.BuildConfig
 import com.rustanovych.kidsoutfit.R
+import com.rustanovych.kidsoutfit.ads.AdConsent
 import com.rustanovych.kidsoutfit.domain.model.ChildGender
 import com.rustanovych.kidsoutfit.domain.model.Place
 import com.rustanovych.kidsoutfit.ui.theme.KidsWeatherOutfitTheme
 import com.rustanovych.kidsoutfit.ui.theme.LocalGlassColors
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun SettingsRoute(
@@ -62,6 +65,9 @@ fun SettingsRoute(
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val showPrivacySettings by viewModel.showPrivacySettings.collectAsStateWithLifecycle()
+    val adConsent = koinInject<AdConsent>()
+    val activity = LocalActivity.current
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
         viewModel::onLocationPermissionResult,
@@ -104,6 +110,8 @@ fun SettingsRoute(
         onNotificationsToggled = viewModel::onNotificationsToggled,
         onTestNotification = viewModel::onTestNotification,
         onOpenLicenses = onOpenLicenses,
+        showPrivacySettings = showPrivacySettings,
+        onOpenPrivacySettings = { activity?.let(adConsent::showPrivacyOptionsForm) },
         modifier = modifier,
     )
 }
@@ -125,6 +133,8 @@ fun SettingsContent(
     onOpenLicenses: () -> Unit,
     modifier: Modifier = Modifier,
     onTestNotification: (() -> Unit)? = null,
+    showPrivacySettings: Boolean = false,
+    onOpenPrivacySettings: () -> Unit = {},
 ) {
     val glass = LocalGlassColors.current
     var timePickerOpen by rememberSaveable { mutableStateOf(false) }
@@ -178,7 +188,15 @@ fun SettingsContent(
                     showChevron = true,
                     onClick = onOpenLicenses,
                 )
-                // Stage 7: a "Privacy settings" row (UMP consent form) goes here, as another SettingsRow.
+                if (showPrivacySettings) {
+                    AboutDivider()
+                    SettingsRow(
+                        title = stringResource(R.string.settings_privacy_settings),
+                        iconRes = R.drawable.ic_ms_privacy,
+                        showChevron = true,
+                        onClick = onOpenPrivacySettings,
+                    )
+                }
             }
         }
     }
