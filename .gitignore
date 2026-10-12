@@ -26,7 +26,7 @@ keystore.properties
 .DS_Store
 
 # Claude Code / project-local
-.claude/settings.local.json
+.claude/
 CLAUDE.md
 progress.md
 
