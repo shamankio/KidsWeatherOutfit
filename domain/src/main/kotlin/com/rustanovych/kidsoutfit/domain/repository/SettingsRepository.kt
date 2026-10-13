@@ -6,7 +6,7 @@ import com.rustanovych.kidsoutfit.domain.model.LocationMode
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Persisted user settings. Implemented in :app on top of DataStore Preferences.
+ * Persisted user settings. Implemented in `:data` on top of DataStore Preferences.
  *
  * Both flows emit the stored value immediately on collection and re-emit on every change, so
  * screens can collect them as their single source of truth. Values that fail to parse (missing,

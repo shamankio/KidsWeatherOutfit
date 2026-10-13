@@ -2,9 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- City-scale accuracy is enough to pick a forecast grid cell; fine location is never used. -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- INTERNET and ACCESS_COARSE_LOCATION are declared by :data and merged in. -->
     <!-- Android 13+ runtime permission, requested in context from Home, never at launch. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Re-creates the morning reminder's work chain after a reboot. -->

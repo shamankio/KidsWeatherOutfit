@@ -76,6 +76,7 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":data"))
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -101,29 +102,18 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
-    // Network
-    implementation(platform(libs.okhttp.bom))
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging.interceptor)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.kotlinx.serialization)
+    // JSON (licenses screen, navigation keys)
     implementation(libs.kotlinx.serialization.json)
-
-    // Storage
-    implementation(libs.androidx.datastore.preferences)
 
     // Images
     implementation(libs.coil.compose)
 
-    // Background work & location
+    // Background work
     implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.play.services.location)
 
     // Ads & consent
     implementation(libs.play.services.ads)
     implementation(libs.user.messaging.platform)
-    // Bridges Play services Task<T> to suspend functions (Task.await).
-    implementation(libs.kotlinx.coroutines.play.services)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

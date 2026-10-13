@@ -2,7 +2,7 @@ package com.rustanovych.kidsoutfit.domain.repository
 
 import com.rustanovych.kidsoutfit.domain.model.Place
 
-/** Looks up places by name for the manual city picker. Implemented in `:app` on top of geocoding. */
+/** Looks up places by name for the manual city picker. Implemented in `:data` on top of geocoding. */
 interface PlaceSearch {
 
     /**

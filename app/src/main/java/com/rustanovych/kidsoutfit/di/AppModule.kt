@@ -1,14 +1,8 @@
 package com.rustanovych.kidsoutfit.di
 
-import com.rustanovych.kidsoutfit.data.location.GeocoderPlaceNameResolver
-import com.rustanovych.kidsoutfit.data.location.LocationPermission
-import com.rustanovych.kidsoutfit.data.location.LocationProvider
-import com.rustanovych.kidsoutfit.data.network.GeocodingDataSource
 import androidx.work.WorkManager
 import com.rustanovych.kidsoutfit.ads.AdConsent
 import com.rustanovych.kidsoutfit.ads.UmpConsentManager
-import com.rustanovych.kidsoutfit.domain.repository.PlaceNameResolver
-import com.rustanovych.kidsoutfit.domain.repository.PlaceSearch
 import com.rustanovych.kidsoutfit.notifications.AndroidDailyOutfitNotifier
 import com.rustanovych.kidsoutfit.notifications.AndroidNotificationPermission
 import com.rustanovych.kidsoutfit.notifications.DailyNotificationScheduler
@@ -29,13 +23,12 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-/** Root Koin module. Repositories, data sources, and ViewModels get registered here. */
+/**
+ * Root Koin module for the app layer: ViewModels, notifications, ads and display formatting.
+ * Repositories and device services come from `:data` (see `dataModule`, `networkModule`).
+ */
 val appModule = module {
 
-    single { LocationProvider(androidContext()) }
-    single { LocationPermission { get<LocationProvider>().hasCoarseLocationPermission() } }
-    single<PlaceNameResolver> { GeocoderPlaceNameResolver(androidContext()) }
-    single<PlaceSearch> { get<GeocodingDataSource>() }
     // Work that must finish even if the screen that started it is gone.
     single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     single<AdConsent> { UmpConsentManager(androidContext(), scope = get()) }

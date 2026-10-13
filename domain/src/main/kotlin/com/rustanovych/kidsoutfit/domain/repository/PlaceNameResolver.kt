@@ -4,7 +4,7 @@ import com.rustanovych.kidsoutfit.domain.model.Coordinates
 
 /**
  * Names the place at a pair of coordinates (reverse geocoding), for the GPS mode where the user
- * never picked a [com.rustanovych.kidsoutfit.domain.model.Place]. Implemented in `:app`.
+ * never picked a [com.rustanovych.kidsoutfit.domain.model.Place]. Implemented in `:data`.
  */
 interface PlaceNameResolver {
 

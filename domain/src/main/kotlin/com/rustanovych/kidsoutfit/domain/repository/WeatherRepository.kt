@@ -5,7 +5,7 @@ import com.rustanovych.kidsoutfit.domain.model.ForecastState
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Provides hourly weather data. Implemented in `:app` against Open-Meteo, on top of a cache that
+ * Provides hourly weather data. Implemented in `:data` against Open-Meteo, on top of a cache that
  * survives process death.
  *
  * Reading and refreshing are separate on purpose: [forecast] is a cold view of whatever is known

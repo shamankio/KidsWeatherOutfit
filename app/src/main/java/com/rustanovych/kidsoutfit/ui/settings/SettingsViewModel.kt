@@ -2,7 +2,7 @@ package com.rustanovych.kidsoutfit.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rustanovych.kidsoutfit.data.location.LocationPermission
+import com.rustanovych.kidsoutfit.domain.repository.LocationPermission
 import com.rustanovych.kidsoutfit.ads.AdConsent
 import com.rustanovych.kidsoutfit.domain.engine.ReminderSchedule
 import com.rustanovych.kidsoutfit.domain.model.ChildGender

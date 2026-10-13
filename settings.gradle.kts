@@ -25,4 +25,5 @@ dependencyResolutionManagement {
 rootProject.name = "Kids Weather Outfit"
 include(":app")
 include(":domain")
+include(":data")
  

@@ -119,7 +119,7 @@ fun snapshots(hours: IntRange, apparent: Double, weatherCode: Int = 0): List<Wea
         )
     }
 
-class FakeLocationPermission(var granted: Boolean = false) : com.rustanovych.kidsoutfit.data.location.LocationPermission {
+class FakeLocationPermission(var granted: Boolean = false) : com.rustanovych.kidsoutfit.domain.repository.LocationPermission {
     override fun isGranted(): Boolean = granted
 }
 

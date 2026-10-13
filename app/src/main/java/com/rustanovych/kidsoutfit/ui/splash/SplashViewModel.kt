@@ -2,7 +2,7 @@ package com.rustanovych.kidsoutfit.ui.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rustanovych.kidsoutfit.data.location.LocationPermission
+import com.rustanovych.kidsoutfit.domain.repository.LocationPermission
 import com.rustanovych.kidsoutfit.domain.model.ForecastState
 import com.rustanovych.kidsoutfit.domain.model.LocationMode
 import com.rustanovych.kidsoutfit.domain.repository.SettingsRepository
